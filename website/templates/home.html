@@ -1,4 +1,16 @@
 {% extends("layout.html") %}
 {% block content %}
 <div>Home</div>
+<div class="graph-container">
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(async function(){
+        let graphHtml = await fetch('/api/median');
+        $('.graph-container').html(await graphHtml.text());
+    });
+</script>
 {% endblock %}
