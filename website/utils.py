@@ -17,24 +17,24 @@ def force_async(fn):
 
     return wrapper
 
-async def get_api_data(session, url):
-  async with session.get(url) as response:
+async def get_api_data(session, queryId):
+  async with session.get(f"https://node-api.flipsidecrypto.com/api/v2/queries/{queryId}/data/latest") as response:
     return await response.json()
   
-async def get_all_data(urls):
+async def get_all_data(queryIds):
     async with aiohttp.ClientSession() as session:
         post_tasks = []
         # prepare the coroutines that post
-        for url in urls:
-            post_tasks.append(get_api_data(session, url))
+        for queryId in queryIds:
+            post_tasks.append(get_api_data(session, queryId))
         # now execute them all at once
         return await asyncio.gather(*post_tasks)
 
 #returns unioned data from multiple sources
 #example chain data of Ethereum and Arbitrum
-async def get_unioned_data_from(urls):
+async def get_unioned_data_from(queryIds):
     ret = []
-    data = await get_all_data(urls)
+    data = await get_all_data(queryIds)
     for chainData in data:
         ret = ret + chainData
     return ret
