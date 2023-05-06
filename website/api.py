@@ -45,7 +45,7 @@ async def stargate_volume():
     df2['YearMonth'] = pd.to_datetime(df2['DATE'],format='%Y-%m-%d').apply(lambda x: x.strftime('%Y-%m'))
     monthly_median = df2.groupby('YearMonth').median(numeric_only=True)
 
-    fig2 = px.bar(
+    fig2 = px.line(
                 monthly_median, 
                 y='TOKEN_AMOUNT_USD',
                 title="Median USD Value Bridged Per Month",
@@ -56,10 +56,10 @@ async def stargate_volume():
             )
     fig2.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Month")
 
-    fig2_user = px.bar(
+    fig2_user = px.line(
                 monthly_median, 
                 y='USER_COUNT',
-                title="Median Users Per Day By Month",
+                title="Median Bridgers Per Day By Month",
                 labels={
                     "YearMonth": "Month",
                     "USER_COUNT": "User Count"
@@ -79,19 +79,19 @@ async def stargate_volume():
             "TOKEN_AMOUNT_USD": "Amount USD"
         }
     )
-    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Date")
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Date", hovermode='x unified')
 
     fig3_user = px.bar(
         by_date_df,
         y="USER_COUNT",
         color="SOURCE_CHAIN",
-        title="Users Per Day By Chain",
+        title="Bridgers Per Day By Chain",
         labels={
             "SOURCE_CHAIN": "Source Chain",
             "USER_COUNT": "User Count"
         }
     )
-    fig3_user.update_layout(yaxis_title="User Count", xaxis_title="Date")
+    fig3_user.update_layout(yaxis_title="User Count", xaxis_title="Date", hovermode='x unified')
 
     return {
         "total_volume_by_source": fig.to_html(),
@@ -169,7 +169,7 @@ async def stargate_token_stats():
     fig2_avg_user = px.bar(
                 total_amount_usd_chain_df, 
                 y='AVERAGE_AMOUNT_USD_PER_USER',
-                title="Average Amount USD Bridged Per Tx",
+                title="Average Amount USD Bridged Per User",
                 labels={
                     "SOURCE_CHAIN": "Source Chain",
                     "TOKEN_AMOUNT_USD": "Amount USD"
@@ -295,21 +295,33 @@ async def stargate_liquidity_changes():
     fig.update_layout(yaxis_title="Amount USD", xaxis_title="Date")
     
     # get data by total volume for source chain
+    total_tx_df = total_df.groupby('DATE').sum(numeric_only=True)
     fig2 = px.bar(
-                total_df, 
-                y='TX_COUNT',
-                color='SOURCE_CHAIN',
-                title="Deposit Tx Count by Date",
+                total_tx_df, 
+                y=['DEPOSIT_TX_COUNT', 'WITHDRAW_TX_COUNT'],
+                title="Deposit and Withdraw Tx Count by Date",
                 labels={
                     "DATE": "Date",
                     "TX_COUNT": "Amount USD"
                 }
             )
     fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Date")
+    fig3 = px.line(
+                total_tx_df, 
+                y=['TOTAL_DEPOSIT', 'TOTAL_WITHDRAW'],
+                title="Deposit and Withdraw Amount USD by Date",
+                labels={
+                    "DATE": "Date",
+                    "TOTAL_DEPOSIT": "Deposit Amount USD",
+                    "TOTAL_WITHDRAW": "Withdraw Amount USD",
+                }
+            )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Date", hovermode="x unified")
 
     return {
         "total_amount_usd": fig.to_html(),
         "total_tx_count": fig2.to_html(),
+        "total_deposit_withdraw": fig3.to_html(),
     }
 
 
@@ -393,7 +405,7 @@ async def stargate_top_user_bridge_stats():
                 total_df, 
                 y='TOKEN_AMOUNT_USD',
                 color='SYMBOL',
-                title="Top Users Amount USD Bridged by Source Chain",
+                title="Top Bridgers Amount USD Bridged by Source Chain",
                 labels={
                     "SOURCE_CHAIN": "Source Chain",
                     "TOKEN_AMOUNT_USD": "Amount USD"
@@ -406,7 +418,7 @@ async def stargate_top_user_bridge_stats():
                 total_df, 
                 y='TX_COUNT',
                 color='SYMBOL',
-                title="Top Users Tx Count by Source Chain",
+                title="Top Bridgers Tx Count by Source Chain",
                 labels={
                     "DATE": "Date",
                     "TX_COUNT": "Tx Count"
@@ -446,7 +458,7 @@ async def stargate_top_user_bridge_stats_by_date():
                 total_df, 
                 y='TOKEN_AMOUNT_USD',
                 color='SOURCE_CHAIN',
-                title="Top Users Amount USD Bridged Per Source Chain By Date",
+                title="Top Bridgers Amount USD Bridged Per Source Chain By Date",
                 labels={
                     "DATE": "Date",
                     "TOKEN_AMOUNT_USD": "Amount USD"
@@ -459,7 +471,7 @@ async def stargate_top_user_bridge_stats_by_date():
                 total_df, 
                 y='TX_COUNT',
                 color='SOURCE_CHAIN',
-                title="Top Users Tx Count Per Source Chain By Date",
+                title="Top Bridgers Tx Count Per Source Chain By Date",
                 labels={
                     "DATE": "Date",
                     "TX_COUNT": "Tx Count"
@@ -470,5 +482,90 @@ async def stargate_top_user_bridge_stats_by_date():
     return {
         "total_amount_usd": fig.to_html(),
         "total_tx_count": fig2.to_html(),
+    }
+
+
+@api.route('/stargate_user_trading_activities')
+async def stargate_user_trading_activities():
+    queryIds = [
+        'bafd3be4-c1bd-485d-bf60-dbbe9ac41c99',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    chain_total_df = df.groupby(['BLOCKCHAIN']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    chain_date_total_df = df.groupby(['BLOCKCHAIN', 'DATE']).sum(numeric_only=True).reset_index().set_index('DATE')
+    chain_average_df = chain_date_total_df.groupby(['BLOCKCHAIN']).mean(numeric_only=True).sort_values('AVERAGE_AMOUNT_USD', ascending=False)
+    platform_total_df = df.groupby(['PLATFORM']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    
+    # get data by total volume for source chain
+    fig = px.bar(
+                chain_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Chain")
+    
+    # get data by total swap tx for source chain
+    fig2 = px.bar(
+                chain_total_df, 
+                y='TX_COUNT',
+                title="Total Swap Tx by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TX_COUNT": "Tx Count"
+                }
+            )
+    fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Chain")
+    
+    # get data by average volume for source chain
+    fig3 = px.bar(
+                chain_average_df, 
+                y='AVERAGE_AMOUNT_USD',
+                title="Average Swap Amount USD Per Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "AVERAGE_AMOUNT_USD": "Average Amount USD"
+                }
+            )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Chain")
+    
+    # get data by total volume for source chain
+    fig4 = px.bar(
+                chain_date_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                color="BLOCKCHAIN",
+                title="Total Swap Amount USD Per Day Per Blockchain",
+                labels={
+                    "DATE": "Date",
+                    "TOTAL_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig4.update_layout(yaxis_title="Amount USD", xaxis_title="Date")
+    
+    # get data by total volume for source chain
+    fig5 = px.bar(
+                platform_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD Per Platform",
+                labels={
+                    "PLATFORM": "Platform",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig5.update_layout(yaxis_title="Amount USD", xaxis_title="Platform")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "total_tx_count": fig2.to_html(),
+        "average_amount_usd": fig3.to_html(),
+        "total_amount_usd_date": fig4.to_html(),
+        "total_amount_usd_platform": fig5.to_html(),
     }
 

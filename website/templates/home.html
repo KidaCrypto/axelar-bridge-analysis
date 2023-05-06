@@ -39,6 +39,11 @@
 
 {% block script %}
 <script>
+    async function getGraphFromUrl(url) {
+        let data = await fetch(url);
+        return await data.json();
+    }
+
     $(document).ready(async function(){
         //let graphHtml = await fetch('/api/median');
         //$('.graph-container').html(await graphHtml.text());
