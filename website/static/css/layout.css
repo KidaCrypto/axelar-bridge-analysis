@@ -3,3 +3,48 @@ body {
     max-width: 1260px;
     padding-top: 20px;
 }
+
+@keyframes placeHolderShimmer {
+  0% {
+    background-position: -800px 0
+  }
+  100% {
+    background-position: 800px 0
+  }
+}
+
+@keyframes shimmer {
+    0% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
+
+ul:not(.nav) {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+div:has(.loader) {    
+    height: 430px;
+    margin-bottom: 20px;
+}
+
+/* loader */
+.loader {
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  background-color: rgba(0,0,0,0.3);
+  height: 100%;
+  width: 100%;
+  position: relative;
+  border-radius: 20px;
+}

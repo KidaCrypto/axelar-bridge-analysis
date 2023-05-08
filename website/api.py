@@ -4,6 +4,7 @@ from flask import Blueprint, render_template
 #plots 
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 #data 
 import pandas as pd
@@ -439,6 +440,98 @@ async def stargate_top_user_bridge_stats():
         "total_amount_usd": fig.to_html(),
         "total_tx_count": fig2.to_html(),
         "table": fig3.to_html(),
+    }
+
+
+@api.route('/stargate_top_user_profits')
+async def stargate_top_user_profits():
+    queryIds = [
+        'd3250383-82f1-415f-9771-4051da89fdb1',
+        'f27a788d-811b-4646-88a5-1072d28023a4',
+        '0cf839d7-5d98-4477-b551-7e0fcea8095b',
+        'ea88760e-67e5-4660-8c34-6b0619772295',
+        'f1b8a2ef-a140-4e78-8d72-4e17d2b9bb3e',
+        '29c0b7a4-235d-40d8-af2e-2b0f972554e4',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    total_df = df.groupby('ADDRESS').sum(numeric_only=True).sort_values('AMOUNT_USD_RECEIVED', ascending=False).reset_index()
+    total_df['address_trunc'] = total_df['ADDRESS'].str.slice(0, 8) + ".."
+    
+    # get data by total volume for source chain
+    fig = px.bar(
+                total_df, 
+                y=['AMOUNT_USD_RECEIVED', 'AMOUNT_USD_SENT'],
+                x="address_trunc",
+                title="Top Bridgers Sent Vs Received",
+                labels={
+                    "address_trunc": "Address",
+                    "AMOUNT_USD_RECEIVED": "Amount USD Received",
+                    "AMOUNT_USD_SENT": "Amount USD Sent"
+                },
+                barmode='group'
+            )
+    
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Address", hovermode="x")
+
+    #diff
+    total_df['slippage'] = (total_df['PROFIT'] / total_df['AMOUNT_USD_SENT']) * 100
+    total_df['in_profit'] = total_df['PROFIT'].apply(lambda x: "Profit" if x >= 0 else "Loss" )
+    total_df = total_df.sort_values('slippage', ascending=False)
+
+    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
+    fig2.add_trace(
+        go.Scatter(x=total_df['address_trunc'], y=total_df['slippage'], name="Slippage (%)", mode="lines"),
+        secondary_y=True
+    )
+
+    fig2.add_trace(
+        go.Bar(x=total_df['address_trunc'], y=total_df['PROFIT'], name="Profit (USD)"),
+        secondary_y=False
+    )
+
+    fig2.update_xaxes(title_text="Address")
+    # Set y-axes titles
+    fig2.update_yaxes(title_text="Profit (USD)", secondary_y=False)
+    fig2.update_yaxes(title_text="Slippage (%)", secondary_y=True)
+    fig2.update_layout(hovermode="x")
+
+    #get if address is in profit
+    count_df = total_df.groupby('in_profit').count().reset_index()
+    fig4 = px.pie(
+                count_df, 
+                names="in_profit",
+                values="slippage", # any column cause the numbers are all the same
+                title="Number of Top Bridgers In Profit",
+                labels={
+                    'slippage': "Count",
+                    'in_profit': 'Type'
+                }
+            )
+
+    fig5 = go.Figure(
+            data=[go.Table(
+                    header=dict(
+                                values=list(["Address", "Amount USD Received", "Amount USD Sent", "Profit", "Slippage"]),
+                                fill_color='paleturquoise',
+                                align='left'),
+                                cells=dict(values=[total_df.ADDRESS, total_df.AMOUNT_USD_RECEIVED, total_df.AMOUNT_USD_SENT, total_df.PROFIT, total_df.slippage],
+                                fill_color='lavender',
+                                align='left'
+                            )
+                )
+            ]
+        )
+
+    return {
+        "sent_vs_received": fig.to_html(),
+        "slippage": fig2.to_html(),
+        # "profit": fig3.to_html(),
+        "profit_pie": fig4.to_html(),
+        "totals_table": fig5.to_html(),
     }
 
 @api.route('/stargate_top_user_bridge_stats_by_date')

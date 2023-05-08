@@ -4,6 +4,9 @@
 <p>
     This bridge mainly supports tokens such as USDC, USDT, and BUSD, besides its own governance token, STG. The bridge utilizes liquidity pools on both source and destination chains to facilitate the bridging process. For example, if a user wants to bridge USDC from the Ethereum mainnet to Arbitrum, the user first sends USDC to the S*USDC pool in Ethereum, and after a while the S*USDC pool in Arbitrum sends the USDC to the user from its liquidity pool. A small fee is paid in the form of the source chain's native gas token (in this case ETH) as bridging fee, thus the user gets more or less the same amount of USDC they've sent in the source chain. Bridging the STG token is a much simpler process, where the contracts mints and burns tokens from the source and destination chains respectively.
 </p>
+<p>
+    The results in this investigation only uses Flipside Crypto's supported chains. All transactions are filtered to only include the bridging process to and from these chains. Swapping activity only includes the data from crosschain table as well.
+</p>
 <h3 class="mt-5">Volume</h3>
 <p>
     Stargate didn't exactly have an explosive start, in fact, it was quite mediocre with less $5M in volume on most days while having $10M-$40M volume spikes on a good day. On the other hand, bigger bridges like Multichain were having that kind of volume on the Ethereum mainnet alone.
@@ -11,14 +14,41 @@
 <p>
     However, an uptrend began to form around 10 to 24 March 2023, where the bridging volume and the number of users began achieving new highs. The median amount in USD in April 2023 went about <strong>4x</strong> as high as its previous month while the number of daily users skyrocketed from 3357 to more than 60k from March to April 2023, which is a <strong>19x increase</strong> in user count!
 </p>
+<div id="stargate_volume_by_date_usd">
+  <div class="loader"></div>
+</div>
+<div id="stargate_volume_by_date_user">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_volume_monthly_median_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_volume_monthly_median_user">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 <h3 class="mt-5">Liquidity</h3>
 <p>
     On the liquidity side of things, deposits started gaining traction around November 2022, with a significant increase in March 2023. However, despite the massive increase in the number of deposit transactions, this did not bring about an increase in the net amount USD deposited. This can only mean one thing, <strong>depositors are depositing small amounts of money</strong> into the pools.
 </p>
+<div id="stargate_liquidity_changes_total_amount_usd">
+  <div class="loader"></div>
+</div>
+<div id="stargate_liquidity_changes_total_tx_count">
+  <div class="loader"></div>
+</div>
 <h3 class="mt-5">Bridger Trading Activities</h3>
 <p>
     Hypothetically, an increase in bridging activity tends to have increased DeFi activity by the bridgers. In DeFi, swaps in DEXs are one of the main indicator of a user's DeFi activity. Hence, in Stargate's case where bridging is booming, we should expect to see an increase in swapping activity too. However, this was not the case. The amount of swaps done by the bridgers had not gone up, rather, the <strong>swapping activity maintained at values before the boom</strong> in bridgers. 
 </p>
+<div id="stargate_user_trading_activities_total_amount_usd_date">
+  <div class="loader"></div>
+</div>
 <h3 class="mt-5">Partners</h3>
 <p>
     In DeFi, partnering up with multiple other DeFi protocols to boost your own protocol's usage is a sound strategy, in Stargate's case, they partnered up with the likes of SushiSwap, Woo Finance, and Rubic to help these protocols go cross-chain and exposes their users to the wider ecosystem. Initially, it was thought that these partnerships ramped up Stargate's activities. Thus, an investigation into the bridge initiator (smart contracts that the user initially interacts with in the same transaction) was carried out.
@@ -26,6 +56,21 @@
 <p>
     The results of this investigation show that the partnerships did increase the usage of Stargate in the bridging scene, however, the users gained from the partnerships are much lower than the expected amount. SushiSwap's integration of Stargate went as far back as July 2022, since then, its contribution is less than 2% of Stargate's total user count on average. Woo Finance's partnership in March had a greater effect, where it contributes around 10% of the user count. Rubic performed worse than SushiSwap. All in all, <strong>partnerships, while useful, did not bring about its recent success</strong>.
 </p>
+<div id="stargate_bridge_initiator_total_amount_usd">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_bridge_initiator_total_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_bridge_initiator_total_user_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 <h3 class="mt-5">Bridger Boom Periods</h3>
 <p>
     The first bridger boom was on 21 September 2022. On that day, Stargate launched a Galxe Quest which was hosted on <a href="https://app.optimism.io/quests/stargate-bridge-optimism" target="_blank">Optimism's own domain</a>. Besides that, Optimism also <a href="https://twitter.com/optimismFND/status/1572284493318488070" target="_blank">tweeted</a> about the campaign on its official twitter account which has over 485k followers. The reward was a cross-chain NFT that can be traded on Opensea. The campaign ran for a week and although it did caused a rather steep decline on the day it ended (3 October), the marketing was a success. The following weeks saw a substantial increase in users and bridging volume when compared to the activity before the campaign.
@@ -65,19 +110,123 @@
     Firstly, the richer bridgers live in the Ethereum mainnet, where they tend to bridge a much larger sum of money per transaction than their peers on the other chains. This comes not as a surprise as Ethereum users have to bear the burden of higher gas fees, such that bridging a small amount of money makes no sense as the transaction fee will most likely be higher than the amount bridged.
 </p>
 <p>
-    Secondly, among the tokens bridged, USDC and USDT are the bridgers' favorite tokens, by far! This, once again, is no surprise. Stablecoins are widely accepted in most chains whereas non-stables are harder to liquidate in other chains. Besides being harder, there tends to be higher slippage when swapping in another chain since there will be less liquidity. Thus, the only way to ensure that the value bridged remain the same is by bridging a stablecoin, where USDC and USDT reigns supreme. 
+    Secondly, Stargate bridgers mostly prefers Arbitrum, Avalanche, and BSC as their L2 solution. Although Polygon and Optimism are less preferred, their overall standing isn't too far behind either. This indicates that the bridgers are truly experiencing the multichain experience.
 </p>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_volume_total_volume_by_source">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_token_stats_avg_amount_usd_chain_tx">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 <p>
-    Thirdly, Stargate bridgers mostly prefers Arbitrum, Avalanche, and BSC as their L2 solution. Although Polygon and Optimism are less preferred, their overall standing isn't too far behind either. This indicates that the bridgers are truly experiencing the multichain experience.
+    Thirdly, among the tokens bridged, USDC and USDT are the bridgers' favorite tokens, by far! This, once again, is no surprise. Stablecoins are widely accepted in most chains whereas non-stables are harder to liquidate in other chains. Besides being harder, there tends to be higher slippage when swapping in another chain since there will be less liquidity. Thus, the only way to ensure that the value bridged remain the same is by bridging a stablecoin, where USDC and USDT reigns supreme. 
 </p>
+<div id="stargate_token_stats_total_amount_usd">
+  <div class="loader"></div>
+</div>
 <p>
-    Fourthly, the richer Stargate patrons tend to be more active. <strong>With far higher stats in median days active, median transaction count, and total amount bridged, this group of users is the heart and soul of the protocol</strong>.
+    Fourthly, the richer Stargate patrons tend to be more active and do the most amount of bridging by USD value. <strong>With far higher stats in median days active, median transaction count, and total amount bridged, this group of users is the heart and soul of the protocol</strong>.
 </p>
+<div id="stargate_bucketed_user_stats_total_amount_usd">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_bucketed_user_stats_median_days_active">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_bucketed_user_stats_median_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<div id="stargate_top_user_bridge_stats_table">
+  <div class="loader"></div>
+</div>
 <p>
     Last but not least, Stargate bridgers tend to swap more using Curve. Since the bridgers mostly use stablecoins and that Curve has the largest stablecoin pool, this result is only natural.
 </p>
-<h3 class="mt-5">Why do the rich Stargate Bridgers use Stargate?</h3>
+<div id="stargate_user_trading_activities_total_amount_usd_platform">
+  <div class="loader"></div>
+</div>
+<h3 class="mt-5">Reason for the Rich to Use Stargate</h3>
+<p>
+    As we can see from the previous graphs, the richer addresses' transactions accounts for more than half of Stargate's total volume. So why do the rich Stargate Bridgers use Stargate, can we entice these addresses to use other bridges? In order to answer this question, a deep dive into the top 20 addresses is carried out.
+</p>
+<p>
+    A manual investigation was done by checking each of the top addresses through the use of block explorers like Etherscan. The top address 0x9681319f4e60dd165ca2432f30d91bb4dcfdfaa2 was the first to be investigated. Through the investigation, it was found out that this address is an arbitrageur. As aforementioned, Stargate uses liquidity pools to facilitate the bridging process, such that positive slippage may occur when transferring, for example, USDT from chain 1 to USDC in chain 2. 0x9681319f4e60dd165ca2432f30d91bb4dcfdfaa2 uses this fact to bridge millions of USDT to USDC from one chain to another, with each transfer netting them ~0.1% in positive slippage.
 
+    <strong>Example Transactions</strong>
+    <ul>
+        <li>
+            <a href="https://etherscan.io/tx/0xf0cfb1012271d35653ad57e03f20bafbac6088959e8024d551c9472285907f97" target="_blank">Sent 999,993 USDC</a><br>
+            <a href="https://arbiscan.io/tx/0x05b2ae4767d05f628e82e3dfba9fe528875af28376d3b45ff1391711d679d6e5" target="_blank">Received 1,000,372.493267 USDC</a>
+        </li>
+        <li>
+            <a href="https://etherscan.io/tx/0x2004526166f302a4b510ef0102b2d1c3d71fb3dcc86047529acfeab135a5f872" target="_blank">Sent 2,000,000 USDC</a><br>
+            <a href="https://arbiscan.io/tx/0x4bab31a9399be5d39cfafdb364c071281ec5b1272c7abaa75d2614d9a796839b" target="_blank">Received 2,000,758.991846 USDC</a>
+        </li>
+    </ul>
+</p>
+<p>
+    The second address to be investigated was 0x989536719a72cfd50348ccd5521256c7eb41a999 and once again, this is an arbitrageur address. Compared to the previous address where it mainly arbitrages stablecoins, this address mainly arbitrages ETH. Although this address arbitrages stablecoins, so far it hasn't turned a profit from that. 
+
+    <strong>Example Transactions</strong>
+    <ul>
+        <li>
+            <a href="https://etherscan.io/tx/0xbc719393373b692422cf90524f363d084d4737aaa303df5ad478590fe950e122" target="_blank">Sent 1,200 ETH</a><br>
+            <a href="https://arbiscan.io/tx/0xae775a4dd758d70d3b6d8500f9d186f0b52e7cbbb9e0e1261c78c657c031da95" target="_blank">Received 1,200.464514882652132069 ETH</a>
+        </li>
+        <li>
+            <a href="https://etherscan.io/tx/0x83387dd9f2245e490fb794030c1f49c465f0d58c8ae5341c81350c8b35f8e2b1" target="_blank">Sent 450 ETH</a><br>
+            <a href="https://optimistic.etherscan.io/tx/0x5ec044f0e4a26d5f2fb55819942dbaacdd5351d35dfee26c928b833fc73c271e" target="_blank">Received 450.16844413052545335 ETH</a>
+        </li>
+    </ul>
+</p>
+<p>
+    A common path was chosen for both of these addresses to do the arbitrages, which is:
+    <ul style="list-style: decimal;">
+        <li>Withdraw funds from a CEX</li>
+        <li>Bridge funds to another chain</li>
+        <li>Deposit funds back to CEX after the bridge</li>
+    </ul>
+    <a href="https://arbiscan.io/tx/0x95b0c6b7992071849d2c3b1ea394ed11bd2bf247e579490e53afd122113e29b7" target="_blank">Example Tx</a>
+</p>
+<p>
+    Seeing that both addresses are arbitrageurs. A summary was conducted to get all the top addresses' profits and losses when using Stargate to bridge stablecoins. The results are shown below.
+</p>
+<div id="stargate_top_user_profits_sent_vs_received">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_top_user_profits_profit_pie">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="stargate_top_user_profits_slippage">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<div id="stargate_top_user_profits_totals_table">
+  <div class="loader"></div>
+</div>
+<p>
+    From the results, we can conclude that even if the top addresses aren't arbitrageurs, it is clear as day as to why they're using Stargate to bridge stablecoins. With 75% of the top addresses in profit for bridging their tokens, and the rest of the other addresses sustaining a less than 0.1% loss in capital, we can say that the top addresses would love to preserve their token values when bridging the tokens, and if they get more than what they're transferring, it encourages them to do more transactions.
+</p>
+<p class="pb-5">
+    An outlier from the result is the address 0x489a8756c18c0b8b24ec2a2b9ff3d4d447f79bec, where it suffered a $2.6M in losses when bridging. To find out, another manual investigation was carried out. Turns out, this address is the infamous BNB bridge hacker. The address was desperately trying to bridge out funds from BSC no matter the cost. Since their funds are ill-gotten, they do not care if they lose large amounts of money doing so. One of the largest losses occured when they bridged $1.9M BUSD to $1.7M USDT. Besides Stargate, the hacker also used Multichain once the losses got too great. 
+</p>
 
 <div class="graph-container">
 
@@ -95,13 +244,31 @@
             '/api/stargate_top_user_bridge_stats', 
             '/api/stargate_top_user_bridge_stats_by_date', 
             '/api/stargate_user_trading_activities', 
+            '/api/stargate_top_user_profits', 
         ];
 
-        /* let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
-        
-        graphs.forEach((graph, index) => {
+        let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
+        let index = 0;
+
+        for(const graph of graphs) {
             for(const [key, graphHtml] of Object.entries(graph)) {
-                $('.graph-container').append(`<span>${key} (${urls[index]})</span><div>${graphHtml}</div>`);
+                let url = urls[index].replace('/api/', '');
+
+                // no need to process if doesn't exist
+                if($(`#${url}_${key}`).length == 0) continue;
+
+                $(`#${url}_${key}`).html(`<div>${graphHtml}</div>`);
+
+                // for performance
+                await sleep(20);
+            }
+            index++;
+        }
+
+        /* graphs.forEach((graph, index) => {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+                $(`.graph-container`).append(`<span>${url}_${key}</span><div>${graphHtml}</div>`);
             }
         }); */
     });

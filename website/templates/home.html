@@ -44,6 +44,10 @@
         return await data.json();
     }
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
     $(document).ready(async function(){
         //let graphHtml = await fetch('/api/median');
         //$('.graph-container').html(await graphHtml.text());
