@@ -1,7 +1,89 @@
+<p>
+    Squid Router is a cross chain swap that's powered by Axelar. Launched in November 2022, it had accumulated over <strong>$13M</strong> in bridge volume to date. It currently faciliates around $135k bridging volume per day. Considering that it launched in the bear market, and that its usage increased tremendously after the first few months, it's doing rather well. 
+</p>
+<p>
+    The bridge supports most of the tokens on each the chains it supports, provided that there are liquidity on the chains' DEXs. To initiate the bridging process, Squid swaps the original token into axlUSDC which is then bridged via Axelar to the destination chain. In the destination chain, the token is then swapped to the intended token. 
+</p>
+<p>
+    The ability to convert any token from the source chain to any token in the destination chain allows the users to conveniently access the markets on those chains. However, the downside to this is that the multiple swaps needed to bridge the assets might also cause high slippages.
+</p>
+<h3 class="mt-5">Volume</h3>
+<p>
+    Squid router's daily transaction volume increased greatly since the start, however, it has largely stagnated at around $150k per day with signs of it trending down. Squid's bridgers seem to be truly multichainers, where the volume on every chain is quite similar to one another.
+</p>
+<div id="squid_volume_by_date_usd">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_volume_monthly_median_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_volume_monthly_median_user">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<div id="squid_volume_total_volume_by_source">
+  <div class="loader"></div>
+</div>
+<div id="squid_volume_by_token">
+  <div class="loader"></div>
+</div>
+<h3 class="mt-5">Users</h3>
+<p>
+    The user count on squid router had two periods where the user count started to gain traction, namely 1 March to 31 March 2022 and 18 April to 21 April 2022, but both attempts failed to retain its users. Since then, the numbers had fallen back to 1 March 2022 levels as of writing. 
+</p>
+<p>
+    Anyhow, let's dive into what happened during these periods. On 27 Feb, EVMOS <a href="https://twitter.com/EvmosOrg/status/1630021058031128576" target="_blank">tweeted</a> about Squid that gained some attention. In the following days, large twitter accounts like <a href="https://twitter.com/vela_exchange/status/1631366300621770753" target="_blank">Vela Exchange</a>, <a href="https://twitter.com/zyberswap/status/1631339109192024064" target="_blank">Zyberswap</a>, and <a href="https://twitter.com/BitKeepOS/status/1631505022709280770">BitKeep</a> tweeted about Squid that gave even more exposure to the protocol. On March 16, Moonbeam <a href="https://twitter.com/MoonbeamNetwork/status/1636043961478389762" target="_blank">announced</a> their 3-week Galxe campaign (which started on 8 March) on their main twitter account, this caused a large spike in user count for the next 2 weeks, ending at around 31 March. The sharp drop signified the end of the campaign.
+</p>
+<p>
+    On 18 April 2022, Squid launched a <a href="https://twitter.com/squidrouter/status/1648267998669709312" target="_blank">Layer3 quest</a> which attracted a lot of new users to the platform. However, once the campaign ended, the user count returned to normal once again.
+</p>
+<div id="squid_volume_by_date_user">
+  <div class="loader"></div>
+</div>
+<p>
+    All in all, although the attempts failed to gain new users for the time being, gaining exposure from such attempts is never a bad thing.
+</p>
+
+
+<div class="graph-container">
+
+</div>
+
 
 <script>
     $(document).ready(async function(){
-        //from squid
-        console.log('squid')
+        let urls = [
+            '/api/squid_volume', 
+        ];
+
+        let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
+        let index = 0;
+
+        for(const graph of graphs) {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+
+                // no need to process if doesn't exist
+                if($(`#${url}_${key}`).length == 0) continue;
+
+                $(`#${url}_${key}`).html(`<div>${graphHtml}</div>`);
+
+                // for performance
+                await sleep(20);
+            }
+            index++;
+        }
+
+        /* graphs.forEach((graph, index) => {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+                $(`.graph-container`).append(`<span>${url}_${key}</span><div>${graphHtml}</div>`);
+            }
+        }); */
     });
 </script>
