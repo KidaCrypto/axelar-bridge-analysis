@@ -15,6 +15,8 @@ from .utils import get_unioned_data_from
 
 api = Blueprint("api", __name__)
 
+# stargate
+
 @api.route('/stargate_volume')
 async def stargate_volume():
     queryIds = [
@@ -662,3 +664,107 @@ async def stargate_user_trading_activities():
         "total_amount_usd_platform": fig5.to_html(),
     }
 
+# squid
+@api.route('/squid_volume')
+async def squid_volume():
+    queryIds = [
+        '8b11eb1e-94cc-46a2-8960-e070c5b94347',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    source_chain_df = df.groupby("SOURCE_CHAIN").sum(numeric_only=True).sort_values("TOKEN_AMOUNT_USD", ascending=False)
+
+    # get data by total volume for source chain
+    fig = px.bar(
+                source_chain_df, 
+                y='TOKEN_AMOUNT_USD',
+                title="USD Value Bridged by Source Chain",
+                labels={
+                    "SOURCE_CHAIN": "Source Chain",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Source Chain", hovermode="x")
+
+    # get data by month's median
+    df2 = pd.DataFrame(data)
+
+    # sum all data first
+    df2 = df2.groupby('DATE').sum(numeric_only=True).reset_index()
+    df2['YearMonth'] = pd.to_datetime(df2['DATE'],format='%Y-%m-%d').apply(lambda x: x.strftime('%Y-%m'))
+    monthly_median = df2.groupby('YearMonth').median(numeric_only=True)
+
+    fig2 = px.line(
+                monthly_median, 
+                y='TOKEN_AMOUNT_USD',
+                title="Median USD Value Bridged Per Month",
+                labels={
+                    "YearMonth": "Month",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig2.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Month", hovermode="x")
+
+    fig2_user = px.line(
+                monthly_median, 
+                y='USER_COUNT',
+                title="Median Bridgers Per Day By Month",
+                labels={
+                    "YearMonth": "Month",
+                    "USER_COUNT": "User Count"
+                }
+            )
+    fig2_user.update_layout(showlegend=False, yaxis_title="User Count", xaxis_title="Month", hovermode="x")
+
+    #get data by date and source chain
+    by_date_df = df.groupby(['DATE', 'SOURCE_CHAIN']).sum(numeric_only=True).reset_index().set_index('DATE')
+    fig3 = px.bar(
+        by_date_df,
+        y="TOKEN_AMOUNT_USD",
+        color="SOURCE_CHAIN",
+        title="USD Value Bridged Per Day by Chain",
+        labels={
+            "SOURCE_CHAIN": "Source Chain",
+            "TOKEN_AMOUNT_USD": "Amount USD"
+        }
+    )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Date", hovermode='x unified')
+
+    fig3_user = px.bar(
+        by_date_df,
+        y="USER_COUNT",
+        color="SOURCE_CHAIN",
+        title="Bridgers Per Day By Chain",
+        labels={
+            "SOURCE_CHAIN": "Source Chain",
+            "USER_COUNT": "User Count"
+        }
+    )
+    fig3_user.update_layout(yaxis_title="User Count", xaxis_title="Date", hovermode='x unified')
+
+    #token amounts
+    token_total_df = df.groupby("SYMBOL").sum(numeric_only=True).sort_values("TOKEN_AMOUNT_USD", ascending=False)
+
+    fig4 = px.bar(
+                token_total_df, 
+                y='TOKEN_AMOUNT_USD',
+                title="USD Value Bridged by Token",
+                labels={
+                    "SYMBOL": "Symbol",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig4.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Symbol", hovermode="x")
+
+    return {
+        "total_volume_by_source": fig.to_html(),
+        "monthly_median_usd": fig2.to_html(),
+        "by_date_usd": fig3.to_html(),
+
+        "monthly_median_user": fig2_user.to_html(),
+        "by_date_user": fig3_user.to_html(),
+
+        "by_token": fig4.to_html(),
+    }
