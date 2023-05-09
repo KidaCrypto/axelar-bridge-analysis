@@ -32,3 +32,7 @@ async def comparison():
 @views.route('/overview')
 async def overview():
     return render_template("tab-overview.html", page="overview")
+
+@views.route('/sql')
+async def sql():
+    return render_template("tab-sql.html", page="sql")
