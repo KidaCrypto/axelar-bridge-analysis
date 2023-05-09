@@ -853,6 +853,140 @@ async def squid_user_trading_activities():
         "total_amount_usd_platform": fig5.to_html(),
     }
 
+@api.route('/squid_bucketed_user_stats')
+async def squid_bucketed_user_stats():
+    queryIds = [
+        '57554cb0-9435-45dd-97ec-ae6175eac1d9', #
+    ]
+    data = await get_unioned_data_from(queryIds)
+    df = pd.DataFrame(data)
+
+    df.set_index("BUCKET", inplace=True)
+
+    #get averages
+    df["AVERAGE_AMOUNT_USD_PER_TX"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["TX_COUNT"]
+    df["AVERAGE_AMOUNT_USD_PER_USER"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["ADDRESS_COUNT"]
+
+    # get data by total volume for source chain
+    fig = px.bar(
+                df, 
+                y='GRAND_TOTAL_AMOUNT_USD_BRIDGED',
+                title="USD Bridged by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "GRAND_TOTAL_AMOUNT_USD_BRIDGED": "Amount USD"
+                }
+            )
+    fig.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+
+    # get data by total volume for source chain
+    fig2_avg_tx = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_TX',
+                title="Average USD Bridged Per Tx by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_TX": "Amount USD"
+                }
+            )
+    fig2_avg_tx.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+    fig2_avg_user = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_USER',
+                title="Average USD Bridged Per User by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_User": "Amount USD"
+                }
+            )
+    fig2_avg_user.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+    fig2_median_tx_count = px.bar(
+                df, 
+                y='MEDIAN_TX_COUNT',
+                title="Median Tx Count",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_TX_COUNT": "Tx Count"
+                }
+            )
+    fig2_median_tx_count.update_layout(showlegend=False, yaxis_title="Tx Count", xaxis_title="Bucket")
+
+    fig2_median_days_active = px.bar(
+                df, 
+                y='MEDIAN_DAYS_ACTIVE',
+                title="Median Days Active",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_DAYS_ACTIVE": "Days Active"
+                }
+            )
+    fig2_median_days_active.update_layout(showlegend=False, yaxis_title="Days Active", xaxis_title="Bucket")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "median_tx_count": fig2_median_tx_count.to_html(),
+        "median_days_active": fig2_median_days_active.to_html(),
+        "avg_amount_usd_chain_tx": fig2_avg_tx.to_html(),
+        "avg_amount_usd_chain_user": fig2_avg_user.to_html(),
+    }
+
+@api.route('/squid_top_user_bridge_stats')
+async def squid_top_user_bridge_stats():
+    queryIds = [
+        '2f984730-775e-485b-af03-3a5a003d6d49',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    total_df = df.groupby(['SOURCE_CHAIN', 'SYMBOL']).sum(numeric_only=True).reset_index().set_index('SOURCE_CHAIN')
+    
+    # get data by total volume for source chain
+    fig = px.bar(
+                total_df, 
+                y='TOKEN_AMOUNT_USD',
+                color='SYMBOL',
+                title="Top Bridgers Amount USD Bridged by Source Chain",
+                labels={
+                    "SOURCE_CHAIN": "Source Chain",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Source Chain")
+    
+    # get data by total volume for source chain
+    fig2 = px.bar(
+                total_df, 
+                y='TX_COUNT',
+                color='SYMBOL',
+                title="Top Bridgers Tx Count by Source Chain",
+                labels={
+                    "DATE": "Date",
+                    "TX_COUNT": "Tx Count"
+                }
+            )
+    fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Source Chain")
+
+    fig3 = go.Figure(data=[go.Table(
+        header=dict(values=list(df.columns),
+                    fill_color='paleturquoise',
+                    align='left'),
+        cells=dict(values=[df.ADDRESS, df.SOURCE_CHAIN, df.DESTINATION_CHAIN, df.SYMBOL, df.TOKEN_AMOUNT_USD, df.DAYS_ACTIVE, df.TX_COUNT],
+                fill_color='lavender',
+                align='left'))
+    ])
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "total_tx_count": fig2.to_html(),
+        "table": fig3.to_html(),
+    }
+
+
 
 # axelar
 @api.route('/axelar_volume')
@@ -973,8 +1107,7 @@ async def axelar_user_trading_activities():
     chain_date_total_df = df.groupby(['BLOCKCHAIN', 'DATE']).sum(numeric_only=True).reset_index().set_index('DATE')
     chain_average_df = chain_date_total_df.groupby(['BLOCKCHAIN']).mean(numeric_only=True).sort_values('AVERAGE_AMOUNT_USD', ascending=False)
     platform_total_df = df.groupby(['PLATFORM']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
-    
-    print (chain_date_total_df)
+
     # get data by total volume for source chain
     fig = px.bar(
                 chain_total_df, 
@@ -1043,3 +1176,137 @@ async def axelar_user_trading_activities():
         "total_amount_usd_date": fig4.to_html(),
         "total_amount_usd_platform": fig5.to_html(),
     }
+
+@api.route('/axelar_bucketed_user_stats')
+async def axelar_bucketed_user_stats():
+    queryIds = [
+        'dd8fc222-b50d-4722-8034-c7bf175363fc', #
+    ]
+    data = await get_unioned_data_from(queryIds)
+    df = pd.DataFrame(data)
+
+    df.set_index("BUCKET", inplace=True)
+
+    #get averages
+    df["AVERAGE_AMOUNT_USD_PER_TX"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["TX_COUNT"]
+    df["AVERAGE_AMOUNT_USD_PER_USER"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["ADDRESS_COUNT"]
+
+    # get data by total volume for source chain
+    fig = px.bar(
+                df, 
+                y='GRAND_TOTAL_AMOUNT_USD_BRIDGED',
+                title="USD Bridged by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "GRAND_TOTAL_AMOUNT_USD_BRIDGED": "Amount USD"
+                }
+            )
+    fig.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+
+    # get data by total volume for source chain
+    fig2_avg_tx = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_TX',
+                title="Average USD Bridged Per Tx by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_TX": "Amount USD"
+                }
+            )
+    fig2_avg_tx.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+    fig2_avg_user = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_USER',
+                title="Average USD Bridged Per User by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_User": "Amount USD"
+                }
+            )
+    fig2_avg_user.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Bucket")
+
+    fig2_median_tx_count = px.bar(
+                df, 
+                y='MEDIAN_TX_COUNT',
+                title="Median Tx Count",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_TX_COUNT": "Tx Count"
+                }
+            )
+    fig2_median_tx_count.update_layout(showlegend=False, yaxis_title="Tx Count", xaxis_title="Bucket")
+
+    fig2_median_days_active = px.bar(
+                df, 
+                y='MEDIAN_DAYS_ACTIVE',
+                title="Median Days Active",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_DAYS_ACTIVE": "Days Active"
+                }
+            )
+    fig2_median_days_active.update_layout(showlegend=False, yaxis_title="Days Active", xaxis_title="Bucket")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "median_tx_count": fig2_median_tx_count.to_html(),
+        "median_days_active": fig2_median_days_active.to_html(),
+        "avg_amount_usd_chain_tx": fig2_avg_tx.to_html(),
+        "avg_amount_usd_chain_user": fig2_avg_user.to_html(),
+    }
+
+@api.route('/axelar_top_user_bridge_stats')
+async def axelar_top_user_bridge_stats():
+    queryIds = [
+        'a5d557b4-de48-4276-b071-3212f5133795',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    total_df = df.groupby(['SOURCE_CHAIN', 'SYMBOL']).sum(numeric_only=True).reset_index().set_index('SOURCE_CHAIN')
+    
+    # get data by total volume for source chain
+    fig = px.bar(
+                total_df, 
+                y='TOKEN_AMOUNT_USD',
+                color='SYMBOL',
+                title="Top Bridgers Amount USD Bridged by Source Chain",
+                labels={
+                    "SOURCE_CHAIN": "Source Chain",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Source Chain")
+    
+    # get data by total volume for source chain
+    fig2 = px.bar(
+                total_df, 
+                y='TX_COUNT',
+                color='SYMBOL',
+                title="Top Bridgers Tx Count by Source Chain",
+                labels={
+                    "DATE": "Date",
+                    "TX_COUNT": "Tx Count"
+                }
+            )
+    fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Source Chain")
+
+    fig3 = go.Figure(data=[go.Table(
+        header=dict(values=list(df.columns),
+                    fill_color='paleturquoise',
+                    align='left'),
+        cells=dict(values=[df.ADDRESS, df.SOURCE_CHAIN, df.DESTINATION_CHAIN, df.SYMBOL, df.TOKEN_AMOUNT_USD, df.DAYS_ACTIVE, df.TX_COUNT],
+                fill_color='lavender',
+                align='left'))
+    ])
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "total_tx_count": fig2.to_html(),
+        "table": fig3.to_html(),
+    }
+

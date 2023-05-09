@@ -1,13 +1,13 @@
 {% extends("layout.html") %}
 {% block content %}
 <p>
-    Axelar is a bridge that allows seamless cross chain transfers by utilizing their universal token wrappers. For example, USDC from the Ethereum mainnet can be wrapped into axlUSDC which can be bridged to any chain that Axelar supports, including to the Cosmos ecosystem. To date, Axelar had bridged over <strong>$2.2B</strong> in tokens across the EVM and Cosmos.
+    Axelar's Satellite is a bridge that allows seamless cross chain transfers by utilizing their universal token wrappers. For example, USDC from the Ethereum mainnet can be wrapped into axlUSDC which can be bridged to any chain that Satellite supports, including to the Cosmos ecosystem. To date, Satellite had bridged over <strong>$2.2B</strong> in tokens across the EVM and Cosmos.
 </p>
 <p>
     While it's not the only bridge that allows EVM chains to connect to the Cosmos, it currently has beaten all other Cosmos bridges and it's currently the de facto bridge to bridge EVM coins such as USDC and WETH into the Cosmos ecosystem as well as to bridge Cosmos tokens such as ATOM and OSMO to EVM chains. 
 </p>
 <p>
-    Currently, Axelar does not charge a bridge fee to bridge the tokens. However, part of the bridged tokens will still be used to pay for the gas fee at the receiving end. As such, a user will never receive the full amount that they sent across the chains, compared to other bridges that rely on liquidity pools. Other than that, with Axelar wrapped tokens not being widely utilized, it currently also faces a problem in having liquidity at the destination chain to swap the wrapped token to the intended token, e.g. axlUSDC to USDC. Besides that, the user will also have to perform at least two transactions before the bridged token is usable (Bridge -> Approve -> Swap).
+    Currently, Satellite does not charge a bridge fee to bridge the tokens. However, part of the bridged tokens will still be used to pay for the gas fee at the receiving end. As such, a user will never receive the full amount that they sent across the chains, compared to other bridges that rely on liquidity pools. Other than that, with Axelar wrapped tokens not being widely utilized, it currently also faces a problem in having liquidity at the destination chain to swap the wrapped token to the intended token, e.g. axlUSDC to USDC. Besides that, the user will also have to perform at least two transactions before the bridged token is usable (Bridge -> Approve -> Swap).
 </p>
 <p style="font-size: 12px;">
     *The results in this investigation only uses Flipside Crypto's supported chains. All transactions are filtered to only include the bridging process to and from these chains. Swapping activity only includes the data from crosschain table as well.
@@ -15,13 +15,13 @@
 
 <h3 class="mt-5">Volume and Users</h3>
 <p>
-    Before Terra's collapse, it's one of the main ways to bridge Terra's UST to the EVM chains. With this in mind and the fact that the Cosmos ecosystem was still in its infancy during Terra's prime, most of Axelar's early volumes are driven by Terra and Avalanche users (Avalanche users are part of the SOLUNAVAX gang).
+    Before Terra's collapse, it's one of the main ways to bridge Terra's UST to the EVM chains. With this in mind and the fact that the Cosmos ecosystem was still in its infancy during Terra's prime, most of Satellite's early volumes are driven by Terra and Avalanche users (Avalanche users are part of the SOLUNAVAX gang).
 </p>
 <p>
-    During Terra's collapse, Terra gave Axelar its final push in the form of about $300M bridge volume for 2 days. After that, Cosmos's leading DEX, Osmosis, became Axelar's main source of usage. Even though Osmosis was able to sustain a constant 300-500 user per day to Axelar post-Terra, we're currently seeing <strong>signs of waning in the volume in USD</strong>. 
+    During Terra's collapse, Terra gave Satellite its final push in the form of about $300M bridge volume for 2 days. After that, Cosmos's leading DEX, Osmosis, became Satellite's main source of usage. Even though Osmosis was able to sustain a constant 300-500 user per day to Satellite post-Terra, we're currently seeing <strong>signs of waning in the volume in USD</strong>. 
 </p>
 <p>
-    Axelar has no noticeable up and down trends for both volume and user count, other than during its early days and a few spikes here and there.
+    Satellite has no noticeable up and down trends for both volume and user count, other than during its early days and a few spikes here and there.
 </p>
 <div id="axelar_volume_by_date_usd">
   <div class="loader"></div>
@@ -42,7 +42,7 @@
     </div>
 </div>
 <p>
-    Another thing to note is that Terra's contribution to the growth of Axelar was so significant that Axelar's all time volume is still contributed by the bridging of Terra's native tokens, Luna and UST. Needless to say, <strong>the loss of Terra was a huge blow to Axelar</strong>.
+    Another thing to note is that Terra's contribution to the growth of Satellite was so significant that Satellite's all time volume is still contributed by the bridging of Terra's native tokens, Luna and UST. Needless to say, <strong>the loss of Terra was a huge blow to Satellite</strong>.
 </p>
 <div id="axelar_volume_total_volume_by_source">
   <div class="loader"></div>
@@ -50,9 +50,48 @@
 <div id="axelar_volume_by_token">
   <div class="loader"></div>
 </div>
+<p class="mt-3">
+    The situation looks more dire when we check out the top users of Satellite. Out of the top 10 users, 8 are Terra users, and out of the top 20, only 5 are not Terra users. With Terra collapsed for almost a year, high ranking Terra addresses indicate that Satellite is not pulling in new whales.
+</p>
+<div id="axelar_top_user_bridge_stats_table">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_top_user_bridge_stats_total_amount_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_top_user_bridge_stats_total_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<p class="mt-3">
+    Satellite is also not luring in a satisfactory number of whales. This is evident when the median days active for users who bridged less than $10M total is higher than those who bridged more than $10M. Despite being able to deliver a lot more volume to the bridge as a whale, most of the volume is made up by those who bridged less.
+</p>
+<div id="axelar_bucketed_user_stats_total_amount_usd">
+  <div class="loader"></div>
+</div>
+<div id="axelar_bucketed_user_stats_avg_amount_usd_chain_tx">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_bucketed_user_stats_median_days_active">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_bucketed_user_stats_median_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 <h3 class="mt-5">Bridger Trading Activities</h3>
 <p>
-    From the graphs, it can be seen that Axelar users are mainly EVM chain users by volume in USD but due to Osmosis having low transaction fee, Osmosis currently has the highest swap transaction count for Axelar users. Axelar users mainly trade on Curve and Uniswap, while Osmosis lags a little bit behind these powerhouses. Judging from this, DeFi mostly happens on EVM chains even if DeFi on Cosmos is cheaper to execute.
+    From the graphs, it can be seen that Satellite users are mainly EVM chain users by volume in USD but due to Osmosis having low transaction fee, Osmosis currently has the highest swap transaction count for Satellite users. Satellite users mainly trade on Curve and Uniswap, while Osmosis lags a little bit behind these powerhouses. Judging from this, DeFi mostly happens on EVM chains even if DeFi on Cosmos is cheaper to execute.
 </p>
 <div id="axelar_user_trading_activities_total_amount_usd_date">
   <div class="loader"></div>
@@ -89,6 +128,8 @@
         let urls = [
             '/api/axelar_volume', 
             '/api/axelar_user_trading_activities', 
+            '/api/axelar_bucketed_user_stats', 
+            '/api/axelar_top_user_bridge_stats',
         ];
 
         let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));

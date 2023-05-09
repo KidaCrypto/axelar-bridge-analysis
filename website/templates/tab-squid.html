@@ -1,10 +1,10 @@
 {% extends("layout.html") %}
 {% block content %}
 <p>
-    Squid Router is a cross chain swap that's powered by Axelar. Launched in November 2022, it had accumulated over <strong>$13M</strong> in bridge volume to date. It currently faciliates around $135k bridging volume per day. Considering that it launched in the bear market, and that its usage increased tremendously after the first few months, it's doing rather well. 
+    Squid Router is a cross chain swap that's powered by squid. Launched in November 2022, it had accumulated over <strong>$13M</strong> in bridge volume to date. It currently faciliates around $135k bridging volume per day. Considering that it launched in the bear market, and that its usage increased tremendously after the first few months, it's doing rather well. 
 </p>
 <p>
-    The bridge supports most of the tokens on each the chains it supports, provided that there are liquidity on the chains' DEXs. To initiate the bridging process, Squid swaps the original token into axlUSDC which is then bridged via Axelar to the destination chain. In the destination chain, the token is then swapped to the intended token. 
+    The bridge supports most of the tokens on each the chains it supports, provided that there are liquidity on the chains' DEXs. To initiate the bridging process, Squid swaps the original token into axlUSDC which is then bridged via squid to the destination chain. In the destination chain, the token is then swapped to the intended token. 
 </p>
 <p>
     The ability to convert any token from the source chain to any token in the destination chain allows the users to conveniently access the markets on those chains. However, the downside to this is that the multiple swaps needed to bridge the assets might also cause high slippages.
@@ -51,8 +51,44 @@
   <div class="loader"></div>
 </div>
 <p>
-    All in all, although the attempts failed to gain new users for the time being, gaining exposure from such attempts is never a bad thing.
+    Judging from the bucketed stats, Squid Router does not have whales using it. Despite this, they have loyal users with high tx counts and days active. That said, the number of loyal users is not enough that even with the high number of transactions and active days, the volume that they created is overshadowed by those who bridged less. Besides that, the average bridged amount per transaction shows that users are not bridging over $15k most of the time, indicating a serious problem with liquidity. 
 </p>
+<div id="squid_bucketed_user_stats_total_amount_usd">
+  <div class="loader"></div>
+</div>
+<div id="squid_bucketed_user_stats_avg_amount_usd_chain_tx">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_bucketed_user_stats_median_days_active">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_bucketed_user_stats_median_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<p>
+    Based on the volume of the top users, we can see that the users of Squid Router is truly experiencing living seamlessly across the chains. Although it has lower volume than most other bridges, achieving this is surely an incredible feat.
+</p>
+<div id="squid_top_user_bridge_stats_table">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_top_user_bridge_stats_total_amount_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_top_user_bridge_stats_total_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 <h3 class="mt-5">Bridger Trading Activities</h3>
 <p>
     Squid users are mostly active on Polygon by transaction count, while the richer addresses lives in Ethereum (no surprise here). Other than that, Uniswap is the go-to DEX for them with a combined volume of $1B across Uniswap v2 and v3. 
@@ -92,6 +128,8 @@
         let urls = [
             '/api/squid_volume', 
             '/api/squid_user_trading_activities', 
+            '/api/squid_bucketed_user_stats', 
+            '/api/squid_top_user_bridge_stats',
         ];
 
         let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
