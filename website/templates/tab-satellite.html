@@ -1,7 +1,85 @@
+<p>
+    Axelar is a bridge that allows seamless cross chain transfers by utilizing their universal token wrappers. For example, USDC from the Ethereum mainnet can be wrapped into axlUSDC which can be bridged to any chain that Axelar supports, including to the Cosmos ecosystem. To date, Axelar had bridged over <strong>$2.2B</strong> in tokens across the EVM and Cosmos.
+</p>
+<p>
+    While it's not the only bridge that allows EVM chains to connect to the Cosmos, it currently has beaten all other Cosmos bridges and it's currently the de facto bridge to bridge EVM coins such as USDC and WETH into the Cosmos ecosystem as well as to bridge Cosmos tokens such as ATOM and OSMO to EVM chains. 
+</p>
+<p>
+    Currently, Axelar does not charge a bridge fee to bridge the tokens. However, part of the bridged tokens will still be used to pay for the gas fee at the receiving end. As such, a user will never receive the full amount that they sent across the chains, compared to other bridges that rely on liquidity pools. Other than that, with Axelar wrapped tokens not being widely utilized, it currently also faces a problem in having liquidity at the destination chain to swap the wrapped token to the intended token, e.g. axlUSDC to USDC. Besides that, the user will also have to perform at least two transactions before the bridged token is usable (Bridge -> Approve -> Swap).
+</p>
+
+<h3 class="mt-5">Volume and Users</h3>
+<p>
+    Before Terra's collapse, it's one of the main ways to bridge Terra's UST to the EVM chains. With this in mind and the fact that the Cosmos ecosystem was still in its infancy during Terra's prime, most of Axelar's early volumes are driven by Terra and Avalanche users (Avalanche users are part of the SOLUNAVAX gang).
+</p>
+<p>
+    During Terra's collapse, Terra gave Axelar its final push in the form of about $300M bridge volume for 2 days. After that, Cosmos's leading DEX, Osmosis, became Axelar's main source of usage. Even though Osmosis was able to sustain a constant 300-500 user per day to Axelar post-Terra, we're currently seeing <strong>signs of waning in the volume in USD</strong>. 
+</p>
+<p>
+    Axelar has no noticeable up and down trends for both volume and user count, other than during its early days and a few spikes here and there.
+</p>
+<div id="axelar_volume_by_date_usd">
+  <div class="loader"></div>
+</div>
+<div id="axelar_volume_by_date_user">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_volume_monthly_median_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_volume_monthly_median_user">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+<p>
+    Another thing to note is that Terra's contribution to the growth of Axelar was so significant that Axelar's all time volume is still contributed by the bridging of Terra's native tokens, Luna and UST. Needless to say, <strong>the loss of Terra was a huge blow to Axelar</strong>.
+</p>
+<div id="axelar_volume_total_volume_by_source">
+  <div class="loader"></div>
+</div>
+<div id="axelar_volume_by_token">
+  <div class="loader"></div>
+</div>
+
+<div class="graph-container">
+
+</div>
+
 
 <script>
     $(document).ready(async function(){
-        //from squid
-        console.log('satellite')
+        let urls = [
+            '/api/axelar_volume', 
+        ];
+
+        let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
+        let index = 0;
+
+        for(const graph of graphs) {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+
+                // no need to process if doesn't exist
+                if($(`#${url}_${key}`).length == 0) continue;
+
+                $(`#${url}_${key}`).html(`<div>${graphHtml}</div>`);
+
+                // for performance
+                await sleep(20);
+            }
+            index++;
+        }
+
+        /* graphs.forEach((graph, index) => {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+                $(`.graph-container`).append(`<span>${url}_${key}</span><div>${graphHtml}</div>`);
+            }
+        }); */
     });
 </script>
