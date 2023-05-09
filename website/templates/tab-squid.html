@@ -1,3 +1,5 @@
+{% extends("layout.html") %}
+{% block content %}
 <p>
     Squid Router is a cross chain swap that's powered by Axelar. Launched in November 2022, it had accumulated over <strong>$13M</strong> in bridge volume to date. It currently faciliates around $135k bridging volume per day. Considering that it launched in the bear market, and that its usage increased tremendously after the first few months, it's doing rather well. 
 </p>
@@ -11,7 +13,7 @@
 <p>
     Squid router's daily transaction volume increased greatly since the start, however, it has largely stagnated at around $150k per day with signs of it trending down. Squid's bridgers seem to be truly multichainers, where the volume on every chain is quite similar to one another.
 </p>
-<div id="squid_volume_by_date_usd">
+<div id="squid_volume_by_date_usd" style="width: 100%">
   <div class="loader"></div>
 </div>
 <div class="row">
@@ -26,10 +28,10 @@
         </div>
     </div>
 </div>
-<div id="squid_volume_total_volume_by_source">
+<div id="squid_volume_total_volume_by_source" style="width: 100%">
   <div class="loader"></div>
 </div>
-<div id="squid_volume_by_token">
+<div id="squid_volume_by_token" style="width: 100%">
   <div class="loader"></div>
 </div>
 <h3 class="mt-5">Users</h3>
@@ -42,23 +44,50 @@
 <p>
     On 18 April 2022, Squid launched a <a href="https://twitter.com/squidrouter/status/1648267998669709312" target="_blank">Layer3 quest</a> which attracted a lot of new users to the platform. However, once the campaign ended, the user count returned to normal once again.
 </p>
-<div id="squid_volume_by_date_user">
+<div id="squid_volume_by_date_user" style="width: 100%">
   <div class="loader"></div>
 </div>
 <p>
     All in all, although the attempts failed to gain new users for the time being, gaining exposure from such attempts is never a bad thing.
 </p>
+<h3 class="mt-5">Bridger Trading Activities</h3>
+<p>
+    Squid users are mostly active on Polygon by transaction count, while the richer addresses lives in Ethereum (no surprise here). Other than that, Uniswap is the go-to DEX for them with a combined volume of $1B across Uniswap v2 and v3. 
+</p>
+<div id="squid_user_trading_activities_total_amount_usd_date" style="width: 100%">
+  <div class="loader"></div>
+</div>
+<div id="squid_user_trading_activities_total_amount_usd_platform" style="width: 100%">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_user_trading_activities_total_amount_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="squid_user_trading_activities_total_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 
 
 <div class="graph-container">
 
 </div>
+{% endblock %}
 
 
+{% block script %}
 <script>
     $(document).ready(async function(){
+        $('#pills-squid-tab').addClass('active');
+
         let urls = [
             '/api/squid_volume', 
+            '/api/squid_user_trading_activities', 
         ];
 
         let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
@@ -87,3 +116,4 @@
         }); */
     });
 </script>
+{% endblock %}

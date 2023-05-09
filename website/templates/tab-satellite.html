@@ -1,3 +1,5 @@
+{% extends("layout.html") %}
+{% block content %}
 <p>
     Axelar is a bridge that allows seamless cross chain transfers by utilizing their universal token wrappers. For example, USDC from the Ethereum mainnet can be wrapped into axlUSDC which can be bridged to any chain that Axelar supports, including to the Cosmos ecosystem. To date, Axelar had bridged over <strong>$2.2B</strong> in tokens across the EVM and Cosmos.
 </p>
@@ -45,16 +47,44 @@
 <div id="axelar_volume_by_token">
   <div class="loader"></div>
 </div>
+<h3 class="mt-5">Bridger Trading Activities</h3>
+<p>
+    From the graphs, it can be seen that Axelar users are mainly EVM chain users by volume in USD but due to Osmosis having low transaction fee, Osmosis currently has the highest swap transaction count for Axelar users. Axelar users mainly trade on Curve and Uniswap, while Osmosis lags a little bit behind these powerhouses. Judging from this, DeFi mostly happens on EVM chains even if DeFi on Cosmos is cheaper to execute.
+</p>
+<div id="axelar_user_trading_activities_total_amount_usd_date">
+  <div class="loader"></div>
+</div>
+<div id="axelar_user_trading_activities_total_amount_usd_platform">
+  <div class="loader"></div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_user_trading_activities_total_amount_usd">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+        <div id="axelar_user_trading_activities_total_tx_count">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
 
 <div class="graph-container">
 
 </div>
+{% endblock %}
 
 
+
+{% block script %}
 <script>
     $(document).ready(async function(){
+        $('#pills-satellite-tab').addClass('active');
+
         let urls = [
             '/api/axelar_volume', 
+            '/api/axelar_user_trading_activities', 
         ];
 
         let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
@@ -83,3 +113,4 @@
         }); */
     });
 </script>
+{% endblock %}

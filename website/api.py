@@ -623,7 +623,7 @@ async def stargate_user_trading_activities():
     fig3 = px.bar(
                 chain_average_df, 
                 y='AVERAGE_AMOUNT_USD',
-                title="Average Swap Amount USD Per Blockchain",
+                title="Average Swap Amount USD Per User By Blockchain",
                 labels={
                     "BLOCKCHAIN": "Chain",
                     "AVERAGE_AMOUNT_USD": "Average Amount USD"
@@ -636,7 +636,7 @@ async def stargate_user_trading_activities():
                 chain_date_total_df, 
                 y='TOTAL_AMOUNT_USD',
                 color="BLOCKCHAIN",
-                title="Total Swap Amount USD Per Day Per Blockchain",
+                title="Total Swap Amount USD By Date",
                 labels={
                     "DATE": "Date",
                     "TOTAL_AMOUNT_USD": "Amount USD"
@@ -769,6 +769,90 @@ async def squid_volume():
         "by_token": fig4.to_html(),
     }
 
+@api.route('/squid_user_trading_activities')
+async def squid_user_trading_activities():
+    queryIds = [
+        'db0ee743-f379-4784-91ca-091cc0e1d535',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    chain_total_df = df.groupby(['BLOCKCHAIN']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    chain_date_total_df = df.groupby(['BLOCKCHAIN', 'DATE']).sum(numeric_only=True).reset_index().set_index('DATE')
+    chain_average_df = chain_date_total_df.groupby(['BLOCKCHAIN']).mean(numeric_only=True).sort_values('AVERAGE_AMOUNT_USD', ascending=False)
+    platform_total_df = df.groupby(['PLATFORM']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    
+    # get data by total volume for source chain
+    fig = px.bar(
+                chain_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Chain")
+    
+    # get data by total swap tx for source chain
+    fig2 = px.bar(
+                chain_total_df, 
+                y='TX_COUNT',
+                title="Total Swap Tx by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TX_COUNT": "Tx Count"
+                }
+            )
+    fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Chain")
+    
+    # get data by average volume for source chain
+    fig3 = px.bar(
+                chain_average_df, 
+                y='AVERAGE_AMOUNT_USD',
+                title="Average Swap Amount USD Per User By Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "AVERAGE_AMOUNT_USD": "Average Amount USD"
+                }
+            )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Chain")
+    
+    # get data by total volume for source chain
+    fig4 = px.bar(
+                chain_date_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                color="BLOCKCHAIN",
+                title="Total Swap Amount USD By Date",
+                labels={
+                    "DATE": "Date",
+                    "TOTAL_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig4.update_layout(yaxis_title="Amount USD", xaxis_title="Date")
+    
+    # get data by total volume for source chain
+    fig5 = px.bar(
+                platform_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD Per Platform",
+                labels={
+                    "PLATFORM": "Platform",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig5.update_layout(yaxis_title="Amount USD", xaxis_title="Platform")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "total_tx_count": fig2.to_html(),
+        "average_amount_usd": fig3.to_html(),
+        "total_amount_usd_date": fig4.to_html(),
+        "total_amount_usd_platform": fig5.to_html(),
+    }
+
 
 # axelar
 @api.route('/axelar_volume')
@@ -873,4 +957,89 @@ async def axelar_volume():
         "by_date_user": fig3_user.to_html(),
 
         "by_token": fig4.to_html(),
+    }
+
+@api.route('/axelar_user_trading_activities')
+async def axelar_user_trading_activities():
+    queryIds = [
+        '17586790-f836-468e-b4b4-e5cfbd8578ec',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+
+    #total amounts
+    chain_total_df = df.groupby(['BLOCKCHAIN']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    chain_date_total_df = df.groupby(['BLOCKCHAIN', 'DATE']).sum(numeric_only=True).reset_index().set_index('DATE')
+    chain_average_df = chain_date_total_df.groupby(['BLOCKCHAIN']).mean(numeric_only=True).sort_values('AVERAGE_AMOUNT_USD', ascending=False)
+    platform_total_df = df.groupby(['PLATFORM']).sum(numeric_only=True).sort_values('TOTAL_AMOUNT_USD', ascending=False)
+    
+    print (chain_date_total_df)
+    # get data by total volume for source chain
+    fig = px.bar(
+                chain_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Chain", hovermode="x")
+    
+    # get data by total swap tx for source chain
+    fig2 = px.bar(
+                chain_total_df, 
+                y='TX_COUNT',
+                title="Total Swap Tx by Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "TX_COUNT": "Tx Count"
+                }
+            )
+    fig2.update_layout(yaxis_title="Tx Count", xaxis_title="Chain", hovermode="x")
+    
+    # get data by average volume for source chain
+    fig3 = px.bar(
+                chain_average_df, 
+                y='AVERAGE_AMOUNT_USD',
+                title="Average Swap Amount USD Per User By Blockchain",
+                labels={
+                    "BLOCKCHAIN": "Chain",
+                    "AVERAGE_AMOUNT_USD": "Average Amount USD"
+                }
+            )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Chain", hovermode="x")
+    
+    # get data by total volume for source chain
+    fig4 = px.bar(
+                chain_date_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                color="BLOCKCHAIN",
+                title="Total Swap Amount USD By Date",
+                labels={
+                    "DATE": "Date",
+                    "TOTAL_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig4.update_layout(yaxis_title="Amount USD", xaxis_title="Date", hovermode="x")
+    
+    # get data by total volume for source chain
+    fig5 = px.bar(
+                platform_total_df, 
+                y='TOTAL_AMOUNT_USD',
+                title="Total Swap Amount USD Per Platform",
+                labels={
+                    "PLATFORM": "Platform",
+                    "TOTAL_AMOUNT_USD": "Total Amount USD"
+                }
+            )
+    fig5.update_layout(yaxis_title="Amount USD", xaxis_title="Platform", hovermode="x")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "total_tx_count": fig2.to_html(),
+        "average_amount_usd": fig3.to_html(),
+        "total_amount_usd_date": fig4.to_html(),
+        "total_amount_usd_platform": fig5.to_html(),
     }

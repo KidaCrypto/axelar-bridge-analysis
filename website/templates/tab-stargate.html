@@ -1,3 +1,5 @@
+{% extends("layout.html") %}
+{% block content %}
 <p>
     Stargate is a DeFi Bridge developed by LayerZero that allows users to bridge tokens across the chains. Launched in March 2022, it has since bridged over <strong>$5.55B</strong> worth of tokens to their destination chains, and in recent months, slowly gaining more momentum in daily bridging volume.
 </p>
@@ -231,10 +233,14 @@
 <div class="graph-container">
 
 </div>
+{% endblock %}
 
 
+{% block script %}
 <script>
     $(document).ready(async function(){
+        $('#pills-stargate-tab').addClass('active');
+
         let urls = [
             '/api/stargate_volume', 
             '/api/stargate_token_stats', 
@@ -273,3 +279,4 @@
         }); */
     });
 </script>
+{% endblock %}
