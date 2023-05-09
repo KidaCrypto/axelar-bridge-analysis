@@ -25,8 +25,8 @@ async def squid():
 async def satellite():
     return render_template("tab-satellite.html", page="satellite")
 
-@views.route('/differences')
-async def differences():
+@views.route('/comparison')
+async def comparison():
     return render_template("tab-key-differences.html", page="differences")
 
 @views.route('/overview')
