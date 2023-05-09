@@ -1,5 +1,116 @@
 {% extends("layout.html") %}
 {% block content %}
+<table class="table table-striped text-center" style="max-width: 1080px; margin: auto; margin-top: 50px; font-size: 12px;">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Stargate</th>
+            <th>Squid</th>
+            <th>Satellite</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Launched</td>
+            <td>March 2022</td>
+            <td>November 2022</td>
+            <td>January 2022</td>
+        </tr>
+        <tr>
+            <td>Bridge Method</td>
+            <td>Liquidity Pools On Both Chains</td>
+            <td>Axelar + DEXs</td>
+            <td>Minting & Burning Wrapped Tokens</td>
+        </tr>
+        <tr>
+            <td>Tokens Received</td>
+            <td>Native Tokens</td>
+            <td>User Chosen Tokens</td>
+            <td>AXL Wrapped Tokens</td>
+        </tr>
+        <tr>
+            <td>Total Volume</td>
+            <td>$5.5B</td>
+            <td>$13M</td>
+            <td>$2.2B</td>
+        </tr>
+        <tr>
+            <td>Current Daily Median Volume<br>(USD)</td>
+            <td>$44M</td>
+            <td>$135k</td>
+            <td>$1.45M</td>
+        </tr>
+        <tr>
+            <td>Current Daily Median Users</td>
+            <td>60k</td>
+            <td>102.5</td>
+            <td>347</td>
+        </tr>
+        <tr>
+            <td>Most Used Chain</td>
+            <td>Ethereum</td>
+            <td>Polygon</td>
+            <td>Terra Classic</td>
+        </tr>
+        <tr>
+            <td>Most Used Token</td>
+            <td>USDC</td>
+            <td>axlUSDC</td>
+            <td>USDC</td>
+        </tr>
+        <tr>
+            <td>Fees</td>
+            <td>Swap Fee + Gas Fee</td>
+            <td>Swap Fee + Gas Fee</td>
+            <td>Gas Fee</td>
+        </tr>
+        <tr>
+            <td>Arbitrage</td>
+            <td>Yes</td>
+            <td>Yes but unlikely*</td>
+            <td>No</td>
+        </tr>
+        <tr>
+            <td>Bridge Limit</td>
+            <td>Unlimited**</td>
+            <td>$100,000</td>
+            <td>$750,000</td>
+        </tr>
+        <tr>
+            <td>Ability to Lure Whales</td>
+            <td>Yes</td>
+            <td>No</td>
+            <td>No***</td>
+        </tr>
+        <tr>
+            <td>Volume Driven By</td>
+            <td>Arbitrageurs + Airdrop Hunters</td>
+            <td>Dex Users</td>
+            <td>Dex Users</td>
+        </tr>
+        <tr>
+            <td>Chain Types Supported</td>
+            <td>EVM</td>
+            <td>EVM</td>
+            <td>EVM + Cosmos</td>
+        </tr>
+    </tbody>
+    <tfoot class="text-right pt-3" style="border: none; border-bottom: 1px solid inherit;">
+        <tr>
+            <td colspan="4" style="border: none;"></td>
+        </tr>
+        <tr>
+            <td class="m-0 p-0" colspan="4" style="border: none;">* Low liquidity makes arbitraging difficult</td>
+        </tr>
+        <tr>
+            <td class="m-0 p-0" colspan="4" style="border: none;">** High volumes will cause high slippage, much like a DEX</td>
+        </tr>
+        <tr>
+            <td class="m-0 p-0" colspan="4" style="border: none;">*** Low liquidity to swap back to native tokens practically limits the max amount a whale is able to transfer</td>
+        </tr>
+    </tfoot>
+</table>
+<div style="padding-bottom: 100px;"></div>
 {% endblock %}
 
 
