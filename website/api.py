@@ -51,7 +51,7 @@ async def stargate_volume():
     fig2 = px.line(
                 monthly_median, 
                 y='TOKEN_AMOUNT_USD',
-                title="Median USD Value Bridged Per Month",
+                title="Median USD Value Bridged Per Day",
                 labels={
                     "YearMonth": "Month",
                     "TOKEN_AMOUNT_USD": "Amount USD"
@@ -62,7 +62,7 @@ async def stargate_volume():
     fig2_user = px.line(
                 monthly_median, 
                 y='USER_COUNT',
-                title="Median Bridgers Per Day By Month",
+                title="Median Bridgers Per Day",
                 labels={
                     "YearMonth": "Month",
                     "USER_COUNT": "User Count"
