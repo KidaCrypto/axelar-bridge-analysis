@@ -6,8 +6,8 @@
 <p>
     This bridge mainly supports tokens such as USDC, USDT, and BUSD, besides its own governance token, STG. The bridge utilizes liquidity pools on both source and destination chains to facilitate the bridging process. For example, if a user wants to bridge USDC from the Ethereum mainnet to Arbitrum, the user first sends USDC to the S*USDC pool in Ethereum, and after a while the S*USDC pool in Arbitrum sends the USDC to the user from its liquidity pool. A small fee is paid in the form of the source chain's native gas token (in this case ETH) as bridging fee, thus the user gets more or less the same amount of USDC they've sent in the source chain. Bridging the STG token is a much simpler process, where the contracts mints and burns tokens from the source and destination chains respectively.
 </p>
-<p>
-    The results in this investigation only uses Flipside Crypto's supported chains. All transactions are filtered to only include the bridging process to and from these chains. Swapping activity only includes the data from crosschain table as well.
+<p style="font-size: 12px;">
+    *The results in this investigation only uses Flipside Crypto's supported chains. All transactions are filtered to only include the bridging process to and from these chains. Swapping activity only includes the data from crosschain table as well.
 </p>
 <h3 class="mt-5">Volume</h3>
 <p>
@@ -81,7 +81,7 @@
     As time goes on, Stargate's popularity started to die down. Although more and more projects started integrating Stargate into their protocol, the user count and volume came and went. As future seems bleak once again, something happened. Around the mid of March 2023, Stargate gone through another burst in user count and transaction volume, and this time, the effects are much greater than their previous campaign.
 </p>
 <p>
-    So what happened? <strong>Arbitrum's $ARB token airdrop happened</strong>. What does this has to do with Stargate, you might ask. As it is, Arbitrum's airdrop was a significant one, where at the minimum, users were airdropped 625 $ARB, worth around $1k at the time of writing. Those who were active on Arbitrum were airdropped a max of around 10,250 $ARB. A few lucky ones were able to sell $ARB for more than $5 a piece, bringing the total value of airdrop to be at least $3k for those people. 
+    So what happened? <strong>Arbitrum's $ARB token airdrop happened</strong>. What does this has to do with Stargate, you might ask. As it is, Arbitrum's airdrop was a significant one, where users were airdropped at least 625 $ARB, worth around $1k at the time of writing. Those who were active on Arbitrum were airdropped a max of around 10,250 $ARB. A few lucky ones were able to sell $ARB for more than $5 a piece, bringing the total value of airdrop to be at least $3k for those people. 
 </p>
 <p>
     As it goes, high value airdrops always bring about speculation. Thus, people were talking about which chains and protocols that should be used to increase the chance of getting an airdrop in the future. Remember that Stargate is developed by LayerZero? Well, you guessed it, LayerZero was among those protocols. The entire Crypto Twitter was talking about how to maximize airdrop farming, and one of them was to use LayerZero's protocols, which in turn, means that Stargate is getting all the attention.
@@ -229,7 +229,7 @@
 <p class="pb-5">
     An outlier from the result is the address 0x489a8756c18c0b8b24ec2a2b9ff3d4d447f79bec, where it suffered a $2.6M in losses when bridging. To find out, another manual investigation was carried out. Turns out, this address is the infamous BNB bridge hacker. The address was desperately trying to bridge out funds from BSC no matter the cost. Since their funds are ill-gotten, they do not care if they lose large amounts of money doing so. One of the largest losses occured when they bridged $1.9M BUSD to $1.7M USDT. Besides Stargate, the hacker also used Multichain once the losses got too great. 
 </p>
-
+<div style="padding-bottom: 100px;"></div>
 <div class="graph-container">
 
 </div>
