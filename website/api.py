@@ -1,22 +1,21 @@
 #packages
-from flask import Blueprint, render_template
+from flask import Blueprint
 
 #plots 
+import plotly
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 #data 
 import pandas as pd
-import numpy as np
 
 #utils
-from .utils import get_unioned_data_from
+from .utils import get_unioned_data_from, genSankey
 
 api = Blueprint("api", __name__)
 
 # stargate
-
 @api.route('/stargate_volume')
 async def stargate_volume():
     queryIds = [
@@ -96,6 +95,12 @@ async def stargate_volume():
     )
     fig3_user.update_layout(yaxis_title="User Count", xaxis_title="Date", hovermode='x unified')
 
+    #for sankey
+    by_source_and_destination_df = df.groupby(['SOURCE_CHAIN', 'DESTINATION_CHAIN']).sum(numeric_only=True).reset_index()
+    by_source_and_destination_df['ALT_DESTINATION_CHAIN'] = by_source_and_destination_df["DESTINATION_CHAIN"].apply(lambda x: x + " (Out)")
+    by_source_and_destination_df = by_source_and_destination_df[by_source_and_destination_df["TOKEN_AMOUNT_USD"] > 1e6]
+    fig5 = genSankey(by_source_and_destination_df, ['SOURCE_CHAIN', 'ALT_DESTINATION_CHAIN'], 'TOKEN_AMOUNT_USD', 'Stargate Source and Destination')
+
     return {
         "total_volume_by_source": fig.to_html(),
         "monthly_median_usd": fig2.to_html(),
@@ -103,6 +108,8 @@ async def stargate_volume():
 
         "monthly_median_user": fig2_user.to_html(),
         "by_date_user": fig3_user.to_html(),
+
+        "sankey": fig5.to_html(),
     }
 
 @api.route('/stargate_token_stats')
@@ -758,6 +765,12 @@ async def squid_volume():
             )
     fig4.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Symbol", hovermode="x")
 
+    #for sankey
+    by_source_and_destination_df = df.groupby(['SOURCE_CHAIN', 'DESTINATION_CHAIN']).sum(numeric_only=True).reset_index()
+    by_source_and_destination_df['ALT_DESTINATION_CHAIN'] = by_source_and_destination_df["DESTINATION_CHAIN"].apply(lambda x: x + " (Out)")
+
+    fig5 = genSankey(by_source_and_destination_df, ['SOURCE_CHAIN', 'ALT_DESTINATION_CHAIN'], 'TOKEN_AMOUNT_USD', 'Squid Source and Destination')
+
     return {
         "total_volume_by_source": fig.to_html(),
         "monthly_median_usd": fig2.to_html(),
@@ -767,6 +780,8 @@ async def squid_volume():
         "by_date_user": fig3_user.to_html(),
 
         "by_token": fig4.to_html(),
+
+        "sankey": fig5.to_html(),
     }
 
 @api.route('/squid_user_trading_activities')
@@ -1082,6 +1097,12 @@ async def axelar_volume():
             )
     fig4.update_layout(showlegend=False, yaxis_title="Amount USD", xaxis_title="Symbol", hovermode="x")
 
+    #for sankey
+    by_source_and_destination_df = df.groupby(['SOURCE_CHAIN', 'DESTINATION_CHAIN']).sum(numeric_only=True).reset_index()
+    by_source_and_destination_df['ALT_DESTINATION_CHAIN'] = by_source_and_destination_df["DESTINATION_CHAIN"].apply(lambda x: x + " (Out)")
+    by_source_and_destination_df = by_source_and_destination_df[by_source_and_destination_df["TOKEN_AMOUNT_USD"] > 1e6]
+    fig5 = genSankey(by_source_and_destination_df, ['SOURCE_CHAIN', 'ALT_DESTINATION_CHAIN'], 'TOKEN_AMOUNT_USD', 'Satellite Source and Destination')
+
     return {
         "total_volume_by_source": fig.to_html(),
         "monthly_median_usd": fig2.to_html(),
@@ -1091,6 +1112,8 @@ async def axelar_volume():
         "by_date_user": fig3_user.to_html(),
 
         "by_token": fig4.to_html(),
+
+        "sankey": fig5.to_html(),
     }
 
 @api.route('/axelar_user_trading_activities')

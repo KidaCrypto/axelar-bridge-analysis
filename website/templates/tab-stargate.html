@@ -231,6 +231,16 @@
 <p class="pb-5">
     An outlier from the result is the address 0x489a8756c18c0b8b24ec2a2b9ff3d4d447f79bec, where it suffered a $2.6M in losses when bridging. To find out, another manual investigation was carried out. Turns out, this address is the infamous BNB bridge hacker. The address was desperately trying to bridge out funds from BSC no matter the cost. Since their funds are ill-gotten, they do not care if they lose large amounts of money doing so. One of the largest losses occured when they bridged $1.9M BUSD to $1.7M USDT. Besides Stargate, the hacker also used Multichain once the losses got too great. 
 </p>
+<h3 class="mt-5">Bridger Sources and Destinations</h3>
+<p>
+    Ethereum is the largest source and destination for Stargate bridge volume, followed by Avalanche, Arbitrum, and BSC. One interesting find from the diagram is that, while both Arbitrum and Optimism are both optimistic rollups released back in 2021, Stargate user much prefer Arbitrum over Optimism. This can be seen by comparing their volumes, where Arbitrum's volume ($1.11B) is nearly the double of Optimism's volume ($517M).
+</p>
+<p>
+    The Sankey Diagram below is generated while filtering out destinations with volume less than $1M in value.
+</p>
+<div id="stargate_volume_sankey">
+  <div class="loader"></div>
+</div>
 <div style="padding-bottom: 100px;"></div>
 <div class="graph-container">
 
