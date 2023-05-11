@@ -1,2 +1,5 @@
 .venv
 __pycache__
+processed.csv
+/address_stats
+*.DS_STORE
