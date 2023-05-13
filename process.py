@@ -13,8 +13,8 @@ from sklearn import tree
 # to save trained data later
 import joblib
 
-def data():
-    directory = 'address_stats'
+def raw():
+    directory = 'raw'
     concatted_df = pd.DataFrame()
     for filename in os.listdir(directory):
         exts = filename.split(".")
@@ -51,7 +51,7 @@ def data():
             print(f'{f}: using sum')
             concatted_df = concatted_df.groupby('ADDRESS').sum()
 
-    concatted_df.to_csv('processed.csv')
+    concatted_df.to_csv('processed/base.csv')
     return
 
 def get_non_zero_count(x, columns):
@@ -64,7 +64,7 @@ def get_non_zero_count(x, columns):
     return count
 
 def advanced():
-    df = pd.read_csv('processed.csv').set_index('ADDRESS')
+    df = pd.read_csv('processed/base.csv').set_index('ADDRESS')
     plucked_df = df[[
         'CONNEXT_TOTAL_AMOUNT_USD_BRIDGED',
         'HOP_TOTAL_AMOUNT_USD_BRIDGED',
@@ -173,10 +173,226 @@ def advanced():
     #remove bad data
     df = df[df['BRIDGES_USED'] > 0]
     
-    df.to_csv('adv_processed.csv')
+    df.to_csv('processed/adv_processed.csv')
+
+def train():
+    df = pd.read_csv('processed/adv_processed.csv')
+    train_age_day(df)
+    train_all_params(df)
+    train_general_swap(df)
+    train_bridged_volume(df)
+    train_day_and_tx(df)
+    train_protocol_swap_activity(df)
+    train_swap_and_bridge(df)
+    train_tx_count(df)
+
+    return
+
+
+def train_bridged_volume(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'TOTAL_AMOUNT_USD_BRIDGED',
+        'ETH_AMOUNT_USD_BRIDGED',
+        'OPTIMISM_AMOUNT_USD_BRIDGED',
+        'ARBITRUM_AMOUNT_USD_BRIDGED',
+        'BSC_AMOUNT_USD_BRIDGED',
+        'POLYGON_AMOUNT_USD_BRIDGED',
+        'AVALANCHE_AMOUNT_USD_BRIDGED',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Bridged Volume Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/bridged_volume.sav'
+    joblib.dump(model, filename)
+
+def train_age_day(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'ETH_AGE_DAY',
+        'OPTIMISM_AGE_DAY',
+        'ARBITRUM_AGE_DAY',
+        'BSC_AGE_DAY',
+        'POLYGON_AGE_DAY',
+        'AVALANCHE_AGE_DAY',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Address Age Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/age_day.sav'
+    joblib.dump(model, filename)
+
+def train_tx_count(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'ETH_TX_COUNT',
+        'OPTIMISM_TX_COUNT',
+        'ARBITRUM_TX_COUNT',
+        'BSC_TX_COUNT',
+        'POLYGON_TX_COUNT',
+        'AVALANCHE_TX_COUNT',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Tx Count Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/tx_count.sav'
+    joblib.dump(model, filename)
+
+def train_protocol_swap_activity(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'UNISWAP_SWAP_VOLUME',
+        'CURVE_SWAP_VOLUME',
+        'OTHER_SWAP_VOLUME',
+        'SWAP_DAYS_ACTIVE',
+        'SWAP_TX_COUNT',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    #model = DecisionTreeClassifier(criterion='entropy')
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Protocol Swap Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/protocol_swap_activity.sav'
+    joblib.dump(model, filename)
+
+def train_general_swap(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'TOTAL_SWAP_AMOUNT_USD',
+        'AVERAGE_SWAP_AMOUNT_USD_PER_TX',
+        'MEDIAN_SWAP_AMOUNT_USD_PER_TX',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("General Swap Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/general_swap.sav'
+    joblib.dump(model, filename)
+
+def train_swap_and_bridge(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'TOTAL_SWAP_AMOUNT_USD',
+        'TOTAL_AMOUNT_USD_BRIDGED',
+        'BRIDGES_USED',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Swap and Bridge Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/swap_and_bridge.sav'
+    joblib.dump(model, filename)
+
+def train_day_and_tx(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'ETH_AGE_DAY',
+        'OPTIMISM_AGE_DAY',
+        'ARBITRUM_AGE_DAY',
+        'BSC_AGE_DAY',
+        'POLYGON_AGE_DAY',
+        'AVALANCHE_AGE_DAY',
+        'ETH_TX_COUNT',
+        'OPTIMISM_TX_COUNT',
+        'ARBITRUM_TX_COUNT',
+        'BSC_TX_COUNT',
+        'POLYGON_TX_COUNT',
+        'AVALANCHE_TX_COUNT',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print("Age and Tx Count Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+    filename = 'tree_models/day_and_tx.sav'
+    joblib.dump(model, filename)
+
+def train_all_params(df: pd.DataFrame):
+    #train the model
+    x_train, x_test, y_train, y_test = train_test_split(df[[
+        'BSC_AGE_DAY',
+        'BSC_TX_COUNT',
+        'TOTAL_SWAP_AMOUNT_USD',
+        'AVERAGE_SWAP_AMOUNT_USD_PER_TX',
+        'MEDIAN_SWAP_AMOUNT_USD_PER_TX',
+        'UNISWAP_SWAP_VOLUME',
+        'CURVE_SWAP_VOLUME',
+        'OTHER_SWAP_VOLUME',
+        'SWAP_DAYS_ACTIVE',
+        'SWAP_TX_COUNT',
+        'ETH_AGE_DAY',
+        'ETH_TX_COUNT',
+        'AVALANCHE_AGE_DAY',
+        'AVALANCHE_TX_COUNT',
+        'OPTIMISM_AGE_DAY',
+        'OPTIMISM_TX_COUNT',
+        'ARBITRUM_AGE_DAY',
+        'ARBITRUM_TX_COUNT',
+        'POLYGON_AGE_DAY',
+        'POLYGON_TX_COUNT',
+        'TOTAL_AMOUNT_USD_BRIDGED',
+        'ETH_AMOUNT_USD_BRIDGED',
+        'OPTIMISM_AMOUNT_USD_BRIDGED',
+        'ARBITRUM_AMOUNT_USD_BRIDGED',
+        'AVALANCHE_AMOUNT_USD_BRIDGED',
+        'BSC_AMOUNT_USD_BRIDGED',
+        'POLYGON_AMOUNT_USD_BRIDGED',
+        'BRIDGES_USED',
+    ]], df['PREFERRED'])
+
+    #get decision tree
+    model = DecisionTreeClassifier(
+        criterion='entropy', 
+        min_samples_leaf=20, 
+    )
+    model.fit(x_train, y_train)
+
+    y_pred = model.predict(x_test)
+    print("All Params Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
+
+    filename = 'tree_models/all_params.sav'
+    joblib.dump(model, filename)
+
 
 def correlation():
-    df = pd.read_csv('processed.csv')
+    df = pd.read_csv('processed/adv_processed.csv')
     total_swap_df = df[[
         'TOTAL_AMOUNT_USD_BRIDGED',
         'CONNEXT_TOTAL_AMOUNT_USD_BRIDGED',
