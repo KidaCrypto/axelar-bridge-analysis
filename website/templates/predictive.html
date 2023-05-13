@@ -143,29 +143,30 @@
     Since the prediction outcome is a user's decision, the Decision Tree prediction method is used. A few prediction models were trained using different sets of data and each yielding different accuracies. 
 </p>
 <img src="{{ url_for('static', filename='images/accuracy.png') }}" alt="accuracy">
-<p>
+<p class="mt-3">
     The final prediction outcomes are obtained by combining the chances of each decision tree to produce the wrong answer and choose the answer which has the lowest fail rate. For example, Decision Tree 1 with 68% accuracy predicts Stargate, Decision Tree 2 with 50% accuracy predicts Satellite, and Decision Tree 3 with 51% predicts Stargate too, then the chances of the answers, Stargate and Satellite, being wrong are 1 - ((1 - 0.68) * (1 - 0.5)) = 84% accurate and 51% accurate for Stargate and Satellite respectively, thus the result will show Stargate with 84% accuracy.
 </p>
 <p>
-    Since the accuracy involving swap models are low, they are omitted.
+    Low prediction accuracy models (< 50%) are omitted from the prediction process.
 </p>
-<div class="row border rounded p-3 my-3">
-    <div class="col-sm-12 col-md-8 d-flex align-items-center justify-content-center" style="height: 60vh;">
-        <i class="fa fa-spinner fa-spin fa-3x d-none" id="scatter-spinner"></i>
-        <div id="scatter-container"></div>
+<div class="row border justify-content-between rounded p-3 my-3">
+    {% for column in predict_columns %}
+    <div class="col-6">
+        <div class="input-group mb-3">
+            <span class="input-group-text">{{column}}</span>
+            <input type="text" class="form-control predict-input" name="{{column}}" style="max-width: 100px;" value="0">
+        </div>
     </div>
-    <div class="col-sm-12 col-md-4 d-flex flex-column">
-        <div class="input-group mb-3">
-            <span class="input-group-text">X</span>
-            <input type="text" class="form-control">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text">Y</span>
-            <input type="text" class="form-control">
-        </div>
-        <button id="gen-predict" class="btn btn-sm btn-success mt-3 align-self-end">Predict</button>
+    {% endfor %}
+</div>
+<div class="d-flex flex-column border justify-content-center align-items-center rounded my-3" style="height: 20vh;">
+    <strong class="mb-3">Result</strong>
+    <div>
+        <i class="fa fa-spinner fa-spin fa-3x d-none" id="predict-spinner"></i>
+        <strong id="predict-result">N/A</strong>
     </div>
 </div>
+<button id="gen-predict" class="btn btn-sm btn-success mt-3 align-self-end">Predict</button>
 <div style="padding-bottom: 100px;"></div>
 <div class="graph-container"></div>
 {% endblock %}
@@ -193,6 +194,94 @@
                 alert('Unable to fetch graph');
             }
             $('#scatter-spinner').addClass('d-none');
+        });
+
+        $('#gen-predict').on('click', async function() {
+            $('#predict-result').text(""); // clear result
+            $('#predict-spinner').removeClass('d-none');
+
+            let data = {};
+
+            $('.predict-input').each(function() {
+                data[$(this).attr('name')] = $(this).val();
+            });
+
+            try {
+                let res = await fetch(`/api/predict`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+                let json = await res.json();
+
+                // array of {protocol, accuracy, models}
+                let accuracies = [];
+
+                // key = model, value = model's result
+                for(const [key, value] of Object.entries(json)) {
+                    let accuracy = 0;
+                    switch(key) {
+                        case "age_day":
+                            accuracy = 0.5357;
+                            break;
+                        case "all_params":
+                            accuracy = 0.6839;
+                            break;
+                        case "bridged_volume":
+                            accuracy = 0.5675;
+                            break;
+                        case "day_and_tx":
+                            accuracy = 0.5502;
+                            break;
+                        case "tx_count":
+                            accuracy = 0.5036;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if(accuracy == 0) {
+                        continue;
+                    }
+
+                    let objectIndex = accuracies.findIndex(x => x.protocol == value);
+
+                    // has no object
+                    if(objectIndex == -1) {
+                        let accuracyObject = {
+                            protocol: value,
+                            accuracy: accuracy,
+                            models: 1
+                        }
+                        accuracies.push(accuracyObject);
+                        continue;
+                    }
+
+                    let accuracyObject = accuracies[objectIndex];
+                    currentFailRate = 1 - accuracyObject.accuracy;
+                    newEntryFailRate = 1 - accuracy;
+                    newFailRate = currentFailRate * newEntryFailRate;
+                    accuracies[objectIndex].accuracy = 1 - newFailRate;
+                    accuracies[objectIndex].models++;
+                }
+
+                // sort by highest accuracy
+                accuracies.sort((a,b) => a.accuracy > b.accuracy? -1 : 1);
+                let text = "";
+                accuracies.forEach(x => {
+                    text += `${x.protocol} (${(x.accuracy * 100).toFixed(2)}%, ${x.models} ${x.models == 1? 'Model' : 'Models'})\n`;
+                })
+                text.trim();
+                $('#predict-result').text(text)
+            }
+
+            catch (e){
+                console.log(e)
+                alert('Unable to fetch graph');
+            }
+            $('#predict-spinner').addClass('d-none');
         });
 
         // get heatmaps

@@ -208,6 +208,7 @@ def train_bridged_volume(df: pd.DataFrame):
     )
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
+    print(x_test)
     print("Bridged Volume Tree Accuracy: {accuracy:.2f}%".format(accuracy=accuracy_score(y_test, y_pred) * 100))
     filename = 'tree_models/bridged_volume.sav'
     joblib.dump(model, filename)

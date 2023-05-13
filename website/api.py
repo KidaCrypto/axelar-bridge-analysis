@@ -12,6 +12,10 @@ import pandas as pd
 
 #utils
 from .utils import get_unioned_data_from, genSankey
+import json
+
+#for importing
+import joblib
 
 api = Blueprint("api", __name__)
 
@@ -1408,3 +1412,106 @@ def scatter():
         "fig": fig.to_html(),
         #"corr": corr,
     }
+
+@api.route('/predict', methods=['POST'])
+def predict():
+    requestJson = json.loads(request.data)
+
+    for key in requestJson:
+        try:
+            requestJson[key] = float(requestJson[key])
+        
+        #default to 0 if cant parse float
+        except:
+            requestJson[key] = 0
+
+    #must be in same order as when trained
+    all_columns = {
+        "all_params": [
+            'BSC_AGE_DAY',
+            'BSC_TX_COUNT',
+            'TOTAL_SWAP_AMOUNT_USD',
+            'AVERAGE_SWAP_AMOUNT_USD_PER_TX',
+            'MEDIAN_SWAP_AMOUNT_USD_PER_TX',
+            'UNISWAP_SWAP_VOLUME',
+            'CURVE_SWAP_VOLUME',
+            'OTHER_SWAP_VOLUME',
+            'SWAP_DAYS_ACTIVE',
+            'SWAP_TX_COUNT',
+            'ETH_AGE_DAY',
+            'ETH_TX_COUNT',
+            'AVALANCHE_AGE_DAY',
+            'AVALANCHE_TX_COUNT',
+            'OPTIMISM_AGE_DAY',
+            'OPTIMISM_TX_COUNT',
+            'ARBITRUM_AGE_DAY',
+            'ARBITRUM_TX_COUNT',
+            'POLYGON_AGE_DAY',
+            'POLYGON_TX_COUNT',
+            'TOTAL_AMOUNT_USD_BRIDGED',
+            'ETH_AMOUNT_USD_BRIDGED',
+            'OPTIMISM_AMOUNT_USD_BRIDGED',
+            'ARBITRUM_AMOUNT_USD_BRIDGED',
+            'AVALANCHE_AMOUNT_USD_BRIDGED',
+            'BSC_AMOUNT_USD_BRIDGED',
+            'POLYGON_AMOUNT_USD_BRIDGED',
+            'BRIDGES_USED',
+        ],
+        "bridged_volume": [
+            'TOTAL_AMOUNT_USD_BRIDGED',
+            'ETH_AMOUNT_USD_BRIDGED',
+            'OPTIMISM_AMOUNT_USD_BRIDGED',
+            'ARBITRUM_AMOUNT_USD_BRIDGED',
+            'BSC_AMOUNT_USD_BRIDGED',
+            'POLYGON_AMOUNT_USD_BRIDGED',
+            'AVALANCHE_AMOUNT_USD_BRIDGED',
+        ],
+        "age_day": [
+            'ETH_AGE_DAY',
+            'OPTIMISM_AGE_DAY',
+            'ARBITRUM_AGE_DAY',
+            'BSC_AGE_DAY',
+            'POLYGON_AGE_DAY',
+            'AVALANCHE_AGE_DAY',
+        ],
+        "day_and_tx": [
+            'ETH_AGE_DAY',
+            'OPTIMISM_AGE_DAY',
+            'ARBITRUM_AGE_DAY',
+            'BSC_AGE_DAY',
+            'POLYGON_AGE_DAY',
+            'AVALANCHE_AGE_DAY',
+            'ETH_TX_COUNT',
+            'OPTIMISM_TX_COUNT',
+            'ARBITRUM_TX_COUNT',
+            'BSC_TX_COUNT',
+            'POLYGON_TX_COUNT',
+            'AVALANCHE_TX_COUNT',
+        ],
+        "tx_count": [
+            'ETH_TX_COUNT',
+            'OPTIMISM_TX_COUNT',
+            'ARBITRUM_TX_COUNT',
+            'BSC_TX_COUNT',
+            'POLYGON_TX_COUNT',
+            'AVALANCHE_TX_COUNT',
+        ],
+    }
+
+    ret = {}
+    for key in all_columns:
+        data = {}
+
+        for column in all_columns[key]:
+            data[column] = requestJson[column]
+
+        arr = [data]
+        df = pd.DataFrame(arr)
+
+        #get the relevant model
+        loaded_model = joblib.load(f'tree_models/{key}.sav')
+        result = loaded_model.predict(df)
+
+        ret[key] = result[0]
+
+    return ret
