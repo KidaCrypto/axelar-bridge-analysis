@@ -392,8 +392,9 @@ def train_all_params(df: pd.DataFrame):
 
 
 def correlation():
+    folder = 'correlations'
     df = pd.read_csv('processed/adv_processed.csv')
-    total_swap_df = df[[
+    bridge_df = df[[
         'TOTAL_AMOUNT_USD_BRIDGED',
         'CONNEXT_TOTAL_AMOUNT_USD_BRIDGED',
         'HOP_TOTAL_AMOUNT_USD_BRIDGED',
@@ -406,6 +407,43 @@ def correlation():
         'SQUID_TOTAL_AMOUNT_USD_BRIDGED',
         'STARGATE_TOTAL_AMOUNT_USD_BRIDGED',
     ]]
+    corr_df = bridge_df.corr()
+
+    corr_df.to_csv(f'{folder}/bridge_corr.csv')
+
+    all_params_df = df[[
+        'BSC_AGE_DAY',
+        'BSC_TX_COUNT',
+        'TOTAL_SWAP_AMOUNT_USD',
+        'AVERAGE_SWAP_AMOUNT_USD_PER_TX',
+        'MEDIAN_SWAP_AMOUNT_USD_PER_TX',
+        'UNISWAP_SWAP_VOLUME',
+        'CURVE_SWAP_VOLUME',
+        'OTHER_SWAP_VOLUME',
+        'SWAP_DAYS_ACTIVE',
+        'SWAP_TX_COUNT',
+        'ETH_AGE_DAY',
+        'ETH_TX_COUNT',
+        'AVALANCHE_AGE_DAY',
+        'AVALANCHE_TX_COUNT',
+        'OPTIMISM_AGE_DAY',
+        'OPTIMISM_TX_COUNT',
+        'ARBITRUM_AGE_DAY',
+        'ARBITRUM_TX_COUNT',
+        'POLYGON_AGE_DAY',
+        'POLYGON_TX_COUNT',
+        'TOTAL_AMOUNT_USD_BRIDGED',
+        'ETH_AMOUNT_USD_BRIDGED',
+        'OPTIMISM_AMOUNT_USD_BRIDGED',
+        'ARBITRUM_AMOUNT_USD_BRIDGED',
+        'AVALANCHE_AMOUNT_USD_BRIDGED',
+        'BSC_AMOUNT_USD_BRIDGED',
+        'POLYGON_AMOUNT_USD_BRIDGED',
+        'BRIDGES_USED',
+    ]]
+    corr_df = all_params_df.corr()
+
+    corr_df.to_csv(f'{folder}/all_params_corr.csv')
     return
 
 if __name__ == '__main__':
