@@ -1,0 +1,230 @@
+{% extends("layout.html") %}
+{% block content %}
+<h3>
+    Raw Data Used
+</h3>
+<p>
+    The stats for the top 100k users of each bridge were obtained to generate the scatter graphs and correlation heatmaps. The data were all obtained using the source chain due to limitations such as only being able to obtain 100k rows from queries and that source + destination combinations will limit the number of unique addresses that we can get.
+</p>
+<p>
+    Stats obtained were:
+    <ul style="list-style: decimal;">
+        <li>Total Amount Bridged and Tx Count</li>
+        <li>Chain Level Total Amount Bridged and Tx Count</li>
+        <li>Protocol Level Total Amount Bridged and Tx Count</li>
+        <li>Protocol Level Total Amount Bridged By Chain and Tx Count</li>
+        <li>Days Active using Bridges</li>
+        <li>Total Amount Swapped and Tx Count</li>
+        <li>Chain Level Total Amount Swapped and Tx Count</li>
+        <li>Protocol Level Total Amount Swapped and Tx Count</li>
+        <li>Protocol Level Total Amount Swapped By Chain and Tx Count</li>
+        <li>Days Active using Swaps</li>
+        <li>Address Chain Level Age</li>
+        <li>Address Chain Level Tx Count</li>
+        <li>Address Number of Bridges Used</li>
+        <li>Address Preferred Bridge</li>
+    </ul>
+</p>
+<h3 class="mt-5">All Parameter Correlation Heatmap</h3>
+<p>
+    From the heatmap below, we see that the total amount bridged has a weak correlation to swap activity and it has barely any correlation to anything else such as the tx count and the address's age. The highest correlation to the total amount bridged by an address is the amount bridged from Ethereum. This means that on most of the chains, the highest volume is always initiated from the Ethereum mainnet instead of L2s.
+</p>
+<p>
+    The number of bridges used is somewhat related to the address's age in general. This means that as the address's age grow, its tendency to use more than one bridge is higher. So what can be understood from this statement is that addresses are not loyal, they can be swayed to use another bridge as time goes by. 
+</p>
+<div id="heatmaps_all_params">
+    <div class="loader"></div>
+</div>
+<h3 class="mt-5">Correlation between Bridges</h3>
+<p>
+    The amount bridged for the bridges has almost no correlation to each other, meaning that when an address is active in a certain bridge, it does not necessarity mean that the address will be active in another bridge. However, the correlation between Synapse and Hop is higher than the other pairs, this means that there maybe be some overlapping for the users of Synapse and Hop (users of Synapse is likely to use Hop and vice versa).
+</p>
+<div id="heatmaps_bridge_only">
+    <div class="loader"></div>
+</div>
+<h3 class="mt-3">Protocol Correlations with Address Stats</h3>
+<p>
+    <ul style="list-style: decimal;">
+        <li>
+            With high correlations on all chains, it can be said that Multichain dominates most of the bridging volumes on all of the EVM chains.
+
+            <div id="correlations_multichain">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            The amount bridged for Across slightly impacts Arbitrum and Optimism bridged amounts, meaning that some users from these two chains will use Across.
+
+            <div id="correlations_across">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Celer has moderate impact on Optimism and Arbitrum's bridging volumes.
+            <div id="correlations_celer">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Connext has little impact on most of the EVM chains and a slight impact on Optimism.
+            <div id="correlations_connext">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Hop has moderate impact on the Ethereum, Optimism, and BSC.
+            <div id="correlations_hop">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Satellite has slight impact on Ethereum and Avalanche.
+            <div id="correlations_satellite">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Squid's volume has weak correlation to every metric.
+            <div id="correlations_squid">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Stargate and Synapse has somewhat high impact on the L2s.
+            <div id="correlations_stargate">
+                <div class="loader"></div>
+            </div>
+            <div id="correlations_synapse">
+                <div class="loader"></div>
+            </div>
+        </li>
+        <li>
+            Contrary to other bridges, the addresses using Multichain, Stargate, and/or Synapse also tends to have higher swapping activity. 
+        </li>
+        <li>
+            Wormhole users use Ethereum to bridge out but seldom use it to bridge tokens back in.
+            <div id="correlations_wormhole">
+                <div class="loader"></div>
+            </div>
+        </li>
+    </ul>
+</p>
+<h3 class="mt-5">Scatter Graph Generator</h3>
+<p>
+    Use this tool to generate scatter graphs for the chosen column pairs. Column pairs with higher correlation coeffecients tend to show clearer patterns. For example, the TOTAL_AMOUNT_USD_BRIDGED and ETHEREUM_AMOUNT_USD_BRIDGED pair has a 0.92 correlation coeffecient, thus, the scatter graph shows that higher ETHEREUM_AMOUNT_USD_BRIDGED means that the TOTAL_AMOUNT_USD_BRIDGED is usually higher.
+</p>
+<div class="row border rounded p-3 my-3">
+    <div class="col-sm-12 col-md-8 d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <i class="fa fa-spinner fa-spin fa-3x d-none" id="scatter-spinner"></i>
+        <div id="scatter-container"></div>
+    </div>
+    <div class="col-sm-12 col-md-4 d-flex flex-column">
+        <div class="input-group mb-3">
+            <span class="input-group-text">X</span>
+            <select id="x" class="form-select">
+                {% for column in columns %}
+                <option value="{{column}}">{{column}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text">Y</span>
+            <select id="y" class="form-select">
+                {% for column in columns %}
+                <option value="{{column}}">{{column}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button id="gen-scatter" class="btn btn-sm btn-success align-self-end">Generate Scatter</button>
+    </div>
+</div>
+<h3 class="mt-5">Predictions using the Decision Tree Method</h3>
+<p>
+    Since the prediction outcome is a user's decision, the Decision Tree prediction method is used. A few prediction models were trained using different sets of data and each yielding different accuracies. 
+</p>
+<img src="{{ url_for('static', filename='images/accuracy.png') }}" alt="accuracy">
+<p>
+    The final prediction outcomes are obtained by combining the chances of each decision tree to produce the wrong answer and choose the answer which has the lowest fail rate. For example, Decision Tree 1 with 68% accuracy predicts Stargate, Decision Tree 2 with 50% accuracy predicts Satellite, and Decision Tree 3 with 51% predicts Stargate too, then the chances of the answers, Stargate and Satellite, being wrong are 1 - ((1 - 0.68) * (1 - 0.5)) = 84% accurate and 51% accurate for Stargate and Satellite respectively, thus the result will show Stargate with 84% accuracy.
+</p>
+<p>
+    Since the accuracy involving swap models are low, they are omitted.
+</p>
+<div class="row border rounded p-3 my-3">
+    <div class="col-sm-12 col-md-8 d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <i class="fa fa-spinner fa-spin fa-3x d-none" id="scatter-spinner"></i>
+        <div id="scatter-container"></div>
+    </div>
+    <div class="col-sm-12 col-md-4 d-flex flex-column">
+        <div class="input-group mb-3">
+            <span class="input-group-text">X</span>
+            <input type="text" class="form-control">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text">Y</span>
+            <input type="text" class="form-control">
+        </div>
+        <button id="gen-predict" class="btn btn-sm btn-success mt-3 align-self-end">Predict</button>
+    </div>
+</div>
+<div style="padding-bottom: 100px;"></div>
+<div class="graph-container"></div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    $(document).ready(async function(){
+        $('#pills-predictive-tab').addClass('active');
+        $('.select2').select2();
+        
+        // setup button clicks
+        $('#gen-scatter').on('click', async function() {
+            $('#scatter-container').html(""); // clear graph
+            $('#scatter-spinner').removeClass('d-none');
+            let x = $('#x').val();
+            let y = $('#y').val();
+            try {
+                let res = await fetch(`/api/scatter?x=${x}&y=${y}`);
+                let json = await res.json();
+                $('#scatter-container').html(json.fig);
+            }
+
+            catch {
+                alert('Unable to fetch graph');
+            }
+            $('#scatter-spinner').addClass('d-none');
+        });
+
+        // get heatmaps
+        let urls = [
+            '/api/heatmaps', 
+            '/api/correlations', 
+        ];
+
+        let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
+        let index = 0;
+
+        for(const graph of graphs) {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+
+                // no need to process if doesn't exist
+                if($(`#${url}_${key}`).length == 0) continue;
+
+                $(`#${url}_${key}`).html(`<div>${graphHtml}</div>`);
+
+                // for performance
+                await sleep(20);
+            }
+            index++;
+        }
+
+        /* graphs.forEach((graph, index) => {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+                $(`.graph-container`).append(`<span>${url}_${key}</span><div>${graphHtml}</div>`);
+            }
+        }); */
+    });
+</script>
+{% endblock %}

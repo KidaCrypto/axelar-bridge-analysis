@@ -1,5 +1,5 @@
 #packages
-from flask import Blueprint
+from flask import Blueprint, request
 
 #plots 
 import plotly
@@ -1333,3 +1333,78 @@ async def axelar_top_user_bridge_stats():
         "table": fig3.to_html(),
     }
 
+@api.route('/heatmaps')
+def heatmaps():
+    #preprocessed
+    bridge_df = pd.read_csv('correlations/bridge_corr.csv').set_index("Unnamed: 0")
+
+    fig = px.imshow(bridge_df,
+                    labels=dict(x="Parameter 1", y="Parameter 2", color="Correlation"),
+                    x=bridge_df.columns,
+                    y=bridge_df.index
+                )
+    fig.update_xaxes(side="top", visible=False)
+    fig.update_yaxes(visible=False)
+    fig.update_layout(showlegend=False, title_text="Correlation of the Bridges")
+
+    df = pd.read_csv('correlations/all_params_corr.csv').set_index("Unnamed: 0")
+
+    fig2 = px.imshow(df,
+                    labels=dict(x="Parameter 1", y="Parameter 2", color="Correlation"),
+                    x=df.columns,
+                    y=df.index
+                )
+    fig2.update_xaxes(side="top", visible=False)
+    fig2.update_yaxes(visible=False)
+    fig2.update_layout(showlegend=False, title_text="Correlation of All Parameters")
+
+    return {
+        "bridge_only": fig.to_html(),
+        "all_params": fig2.to_html(),
+    }
+
+@api.route('/correlations')
+def correlations():
+    bridges = [
+        'Across',
+        'Celer',
+        'Connext',
+        'Hop',
+        'Multichain',
+        'Satellite',
+        'Squid',
+        'Stargate',
+        'Synapse',
+        'Wormhole',
+    ]
+
+    ret = {}
+    for bridge in bridges:
+        df = pd.read_csv(f'correlations/{bridge.lower()}_corr.csv').set_index("Unnamed: 0")
+        # get data by total volume for source chain
+        fig = px.bar(
+                    df, 
+                    y=f'{bridge.upper()}_TOTAL_AMOUNT_USD_BRIDGED',
+                    title=f"Correlation To Total Bridged ({bridge})",
+                    labels={
+                        "TOTAL_AMOUNT_USD": "Correlation",
+                        "Unnamed: 0": "Parameter"
+                    }
+                )
+        fig.update_layout(showlegend=False, yaxis_title="Correlation", xaxis_title="Parameter")
+        ret[bridge.lower()] = fig.to_html()
+
+    return ret
+
+@api.route('/scatter', methods=['GET'])
+def scatter():
+    df = pd.read_csv('processed/adv_processed.csv')
+    x = request.args['x']
+    y = request.args['y']
+    corr = df[x].corr(df[y])
+    fig = px.scatter(df, x=x, y=y)
+    fig.update_layout(title_text="Correlation: {corr:.3f}".format(corr=corr))
+    return {
+        "fig": fig.to_html(),
+        #"corr": corr,
+    }
