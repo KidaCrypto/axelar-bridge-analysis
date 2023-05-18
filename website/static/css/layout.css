@@ -31,7 +31,7 @@ body {
     }
 }
 
-ul:not(.nav) {
+ul:not(.navbar-nav) {
     margin-top: 10px;
     margin-bottom: 50px;
 }

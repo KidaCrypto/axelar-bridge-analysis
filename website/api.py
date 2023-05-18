@@ -497,7 +497,7 @@ async def stargate_top_user_profits():
 
     fig2 = make_subplots(specs=[[{"secondary_y": True}]])
     fig2.add_trace(
-        go.Scatter(x=total_df['address_trunc'], y=total_df['slippage'], name="Slippage (%)", mode="lines"),
+        go.Scatter(x=total_df['address_trunc'], y=total_df['slippage'], name="Profit (%)", mode="lines"),
         secondary_y=True
     )
 
@@ -509,7 +509,7 @@ async def stargate_top_user_profits():
     fig2.update_xaxes(title_text="Address")
     # Set y-axes titles
     fig2.update_yaxes(title_text="Profit (USD)", secondary_y=False)
-    fig2.update_yaxes(title_text="Slippage (%)", secondary_y=True)
+    fig2.update_yaxes(title_text="Profit (%)", secondary_y=True)
     fig2.update_layout(hovermode="x")
 
     #get if address is in profit

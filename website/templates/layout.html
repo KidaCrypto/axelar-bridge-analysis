@@ -65,29 +65,31 @@
   </head>
 <body>
     
-    <ul class="nav nav-pills mb-3" id="pills-tab">
-      <li class="nav-item">
-        <a href="/" class="nav-link" id="pills-stargate-tab">Stargate</a>
-      </li>
-      <li class="nav-item">
-        <a href="/squid" class="nav-link" id="pills-squid-tab">Squid</a>
-      </li>
-      <li class="nav-item">
-        <a href="/satellite" class="nav-link" id="pills-satellite-tab">Satellite</a>
-      </li>
-      <li class="nav-item">
-        <a href="/comparison" class="nav-link" id="pills-key-differences-tab">Comparison</a>
-      </li>
-      <li class="nav-item">
-        <a href="/overview" class="nav-link" id="pills-overview-tab">Overview</a>
-      </li>
-      <li class="nav-item">
-        <a href="/predictive" class="nav-link" id="pills-predictive-tab">Predictive Analysis</a>
-      </li>
-      <li class="nav-item">
-        <a href="/sql" class="nav-link" id="pills-sql-tab">SQL Queries</a>
-      </li>
-    </ul>
+    <nav class="navbar navbar-expand-lg border rounded p-1 h-100 mb-3">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item mr-3">
+            <a class="nav-link" id="overview" href="/">Overview</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="details-dropdown" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Analyses
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" id="stargate" href="/stargate">Stargate</a>
+              <a class="dropdown-item" id="squid" href="/squid">Squid</a>
+              <a class="dropdown-item" id="satellite" href="/satellite">Satellite</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" id="sql" href="/sql">SQL Queries</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
     {% block content %}{% endblock %}
 
     <footer class="footer">
