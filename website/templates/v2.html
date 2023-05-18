@@ -1,0 +1,26 @@
+{% extends("layout.html") %}
+{% block content %}
+<p>
+    This research brought us the conclusion that whales make up most of the the bridges' volumes and that Axelar's low liquidity is hindering the involvement of said whales in Axelar. So, the most logical path ahead would be to increase the liquidities on the chains that Axelar supports.
+</p>
+<p>
+    For V2, we will be discussing:
+    <ul style="list-style: decimal;">
+        <li>Axelar Users VS Liquidity</li>
+        <li>Protocol liquidities</li>
+        <li>Chain liquidities</li>
+        <li>What drives a user to provide liquidity</li>
+        <li>Liquidity VS value bridged</li>
+    </ul>
+</p>
+<div style="padding-bottom: 100px;"></div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    $(document).ready(async function(){
+        $('#v2').addClass('active');
+    });
+</script>
+{% endblock %}
