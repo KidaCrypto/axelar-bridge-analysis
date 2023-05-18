@@ -1,95 +1,43 @@
 {% extends("layout.html") %}
 {% block content %}
-<h3>Axelar's Main Issues</h3>
+<h3>Summary of the Growth of Stargate</h3>
 <p>
-    <strong>Illiquid wrapped tokens are Axelar's biggest obstacle to adoption</strong>. Since wrapped tokens are hardly used in most of the dApps, the bridged axl wrapped tokens are always swapped back into the chain's native stablecoin. And to do that, users have to resort to using DEXs. With low liquidity in all the L2's, bridging large amounts of USDC through Axelar is simply not possible / illogical since the slippage will be too high. For example, bridgers will only be able to swap $100k worth of axlUSDC to ~$50k worth of USDC in Arbitrum, that's a 50% loss of funds. 
-</p>
-<div class="d-flex flex-column align-items-center my-3">
-    <img src="{{ url_for('static', filename='images/USDC_Liquidity.png') }}" alt="USDC Liquidity" height="500" class="mb-2">
-    <strong>axlUSDC Liquidity</strong>
-    <img src="{{ url_for('static', filename='images/USDT_Liquidity.png') }}" alt="USDT Liquidity" height="500" class="mb-2 mt-5">
-    <strong>axlUSDT Liquidity</strong>
-</div>
-<p>
-    From the charts, we know that whales drive most of the volume for most of the bridges, although they are few in numbers. To put things into perspective, the combined volume of Stargate users that bridged over $10M worth of tokens is worth slightly less than the rest combined even though there are fewer than 100 of them. These whales bridge between $1M to an upwards of about $10M worth of assets in a single transaction on average. Combining these facts and the fact that Axelar is currently suffering from low liquidity across the chains, <strong>there currently isn't any way to accomodate these whales</strong>.
+    Stargate, a bridge that focuses on stablecoins, recently gained popularity among the bridgers, where the protocol experienced a 4x increase in bridging volume in USD and a 19x increase in user counts from March 2023 to April 2023. In this analysis, we found out the paths that they have taken to reach this point and several reasons for its continued usage.
 </p>
 <p>
-    The dependency on DEXs to swap back into the intended coin/token also hinders adoption. Most liquidity pools charge 0.3% as swap fee, in comparison, by having their own liquidity pools, Stargate was able to only charge 0.06% as bridge fee, which is 5 times lower than DEXs. So, for people who intend to bridge large sums, the obvious choice would be to use a bridge that would cause the least loss of value after bridging.
-</p>
-<p>
-    In summary, Axelar's current issues are:
-    <ul>
-        <li>
-            Low liquidity
-            <ul>
-                <li>Causes high slippage</li>
-                <li>Makes the involvement of whales in the ecosystem almost impossible</li>
-                <li>Lose out market share provided by the whales</li>
-            </ul>
-        </li>
-        <li>
-            Almost no adoption by other protocols
-            <ul>
-                <li>Adoption of axl wrapped tokens will nullify the effect of low liquidity since there will be no need to swap the wrapped tokens back to the native tokens</li>
-            </ul>
-        </li>
-        <li>
-            High loss of value after bridging (compared to Stargate) due to dependency on DEXs
-            <ul>
-                <li>Sways the bridgers to favor the ones with the lowest fees</li>
-            </ul>
-        </li>
-    </ul>
-</p>
-<h3 class="mt-5">Marketing</h3>
-<p>
-    On the marketing side of things, one of the most noticeable events that successfully attracted new users. were those Galxe Campaigns. These campaigns work by asking users to do certain tasks in order to obtain NFTs or Badges or Tokens of participation. By incentivizing users to use the protocols, even by giving them tokens that are useless otherwise, users are far more likely to try out the protocol. Satellite's having no noticeable up trends while both Stargate and Squid have it proves that these campaigns do indeed make an impact.
-</p>
-<div class="d-flex flex-column align-items-center my-3">
-    <img src="{{ url_for('static', filename='images/stargate_galxe.png') }}" alt="USDC Liquidity" height="500" class="mb-2">
-    <strong>Stargate Galxe Campaign</strong>
-    <img src="{{ url_for('static', filename='images/squid_galxe.png') }}" alt="USDT Liquidity" height="500" class="mb-2 mt-5">
-    <strong>Squid Galxe Campaign</strong>
-</div>
-<p>
-    In comparison, tweets / marketing campaigns by large twitter accounts seldom have such an effect if there was no incentives behind it.
-</p>
-<p>
-    <strong>The most efficient marketing was done through the combination of tweets by reputable brands and incentivizing user engagement in the protocol</strong>. Scratch that, even the hint of incentives (airdrop speculation which may or may not be true) may be good enough to drive usage. 
-</p>
-<p>
-    The retainment of users proves to be a completely different issue though. For example, both Squid's and Stargate's campaigns successfully increased usage of their protocols, however, Squid's userbase shrunk back to its original state while Stargate's campaign successfully retained the new users for months to come. 
+    Stargate didn't start out with a bang, where its market share in the bridging scene is tiny compared to the bigger bridges. Things didn't improve until they launched a Galxe Campaign along with Optimism on 21 September 2022. The Galxe Campaign successfully garnered some attention and Stargate's userbase continued to grow. This growth period continued on until early January 2023, after that its userbase began to shrink.
 </p>
 
-<h3 class="mt-5">Protocol Summaries</h3>
-<h4 class="mt-2">Stargate</h4>
+<div class="d-flex flex-column align-items-center my-3">
+    <img src="{{ url_for('static', filename='images/stargate_galxe.png') }}" alt="Stargate Galxe Campaign" height="500" class="mb-2">
+    <strong>Stargate Galxe Campaign</strong>
+</div>
 <p>
-    Although Stargate is developed by one of the most well known developers in the EVM ecosystem, it had somewhat of a rocky start and almost faded into the backgrounds. However, a series of events, planned and unplanned, happened which led to its current growth stage.
+    The userbase continued to shrink until March 2023. In that month, Arbitrum's governance token was airdropped. Due to the amount that was airdropped, rumors regarding LayerZero's airdrop plan began to spread among the community. Stargate, being one of LayerZero's products, was rumored to be one of the key protocols to use to secure one's eligibility for the airdrop. Since then, Stargate had experienced explosive growth in both user count and bridge volume it's never seen before.
 </p>
 <p>
-    The first event was that Stargate launched a Galxe Campaign which was hosted on Optimism's domain. This along with numerous collaborations announced along the way propelled Stargate's popularity for a few months before dying down. 
+    Similar to other bridges, whales make up most of Stargate's bridge volume. In this analysis, we found out that these whales suffer minimal losses in the bridging process, where some even gained value after using the bridge. This is due to Stargate's implementation of liquidity pools in both the source and destination chains with minimal protocol fees (6bps as of writing).
 </p>
 <p>
-    The event that was truly impactful was Arbitrum's airdrop which led to a series of speculations by twitter users which claimed that LayerZero is planning an airdrop in the future. Naturally, airdrop hunters that don't want to miss out on a potential airdrop rushed to use LayerZero products, including Stargate. Whether this surge of users is healthy or not remains unknown.
+    Stargate users are allowed to bridge from one stablecoin to another (for example, USDC to USDT), where it indirectly allowed arbitrages to happen. Sure enough, this ability to do arbitrages using Stargate's liquidity pools didn't go unnoticed, where arbitrageurs started making trades as soon as the opportunity arises. 
 </p>
 <p>
-    <strong>Stargate's massive TVL and its bridging mechanism also allowed whales and arbitrageurs to bridge large quantities of tokens</strong> without the risk of losing too much in slippage, besides being able to earn from arbitrages. This massively boosted the bridge's usage as it was found out that most of the volumes were done by this group of users.
-</p>
-<h4 class="mt-5">Squid Protocol</h4>
-<p>
-    Squid Protocol is a novel approach to improve the cross chain experience by providing a solution to cross chain swaps. Powered by Axelar, Squid Protocol allows users to bridge a token from a chain to another token in another chain. For example, users are able to swap ETH from the Ethereum mainnet to USDC in the Polygon mainnet.
+    These arbitrages on average makes the trader about 0.1% wealthier for each transaction. Thus, to meaningfully gain from these trades, one must bridge a huge amount of tokens across the chains, and of course, huge amounts of tokens were indeed bridged by the arbitrageurs, so much so that Stargate's top user is an arbitrageur.
 </p>
 <p>
-    Although it is novel, reliance on DEXs to perform the swaps heavily impacts the bridge's swap fees. This combined with the fact that axlUSDC has low liquidity in most chains impaired the protocol's ability to truly shine and stand out in the market.
+    So what had we learned from studying Stargate?
+    <ul>
+        <li>Campaigns are essential to garner attention and increase the community's awareness about a protocol</li>
+        <li>The lower the loss of value after bridging the better</li>
+        <li>Arbitrages are important to drive up a bridge's volume</li>
+    </ul>
 </p>
-<h4 class="mt-5">Satellite</h4>
 <p>
-    Satellite is the de facto bridge from the EVM chains to the Cosmos. Despite this, its volume is a lot less than Stargate. This shows that the DeFi scene in Cosmos is in its infancy, and with most DeFi users living in the EVM chains, its novelty to bridge into the Cosmos system currently isn't in effect. Besides that, the collapse of Terra, which was Cosmos's shining DeFi Hub, took a toll on Satellite too.
+    <strong>
+        In conclusion, Stargate's users were gained through Galxe campaigns and by being a key part of a widespread rumor regarding LayerZero's airdrop, while its volume were sustained by arbitrageurs profiting off the Stargate's liquidity pools.
+    </strong>
 </p>
-<p>
-    One of the biggest advantages of Satellite is the versatility that it offers. By wrapping a native token to a Axelar Wrapped token, a user is able to bridge to any chain that is supported by Axelar. This token is automatically redeemed 1:1 to the native token once it arrives back to its original chain.
-</p>
-<h3 class="mt-5">Comparison</h3>
+<h3 class="mt-5">Comparison between Stargate and Squid / Satellite</h3>
 <table class="table table-striped text-center" style="max-width: 1080px; margin: auto; margin-top: 50px; font-size: 12px;">
     <thead>
         <tr>
@@ -200,6 +148,28 @@
         </tr>
     </tfoot>
 </table>
+
+<h3 class="mt-5">Axelar / Squid's Challenges</h3>
+<p>
+    By comparing Axelar / Squid to Stargate, we found several key challenges that might benefit Axelar / Squid once solved.
+</p>
+<p>
+    First and foremost, the most glaring issue that Axelar faces is that Axelar has low liquidity for its tokens in all of the chains that it supports. While we learned that low losses increases usage, low liquidity in the chains vastly increases the cost of a bridge. Since Axelar users receives Axelar wrapped tokens after bridging, the only way that they can utilize these tokens is by swapping it back using a DEX. Low liquidity pools ensure that no user will bridge large volumes using Axelar. For example, bridging $100k worth of USDC to Arbitrum using Axelar can only be swapped back to $50k worth of usable USDC, which results in a 50% loss.
+</p>
+
+<div class="d-flex flex-column align-items-center my-3">
+    <img src="{{ url_for('static', filename='images/USDC_Liquidity.png') }}" alt="USDC Liquidity" height="500" class="mb-2">
+    <strong>axlUSDC Liquidity</strong>
+    <img src="{{ url_for('static', filename='images/USDT_Liquidity.png') }}" alt="USDT Liquidity" height="500" class="mb-2 mt-5">
+    <strong>axlUSDT Liquidity</strong>
+</div>
+
+<p>
+    This issue of having low liquidity also brought about the bridge limitations, where Squid can only process about $100k for a single transaction while Axelar can at most process up to $750k for a single transaction. This limitation essentially blocked whales from participating in the protocol, where we know that they bridge over $1M worth of tokens per transaction on average.
+</p>
+<p>
+    However, there are also steps taken by Squid that are in the right direction. For example, Squid's Galxe and Layer3 campaigns, although it ultimately failed to retain its users, were a massive success. During those event periods, Squid's user count was more than 10 times its usual value. With that said, Squid has to find a way to retain these newly gained users if not it will be all for naught.
+</p>
 
 <div style="padding-bottom: 100px;"></div>
 {% endblock %}
