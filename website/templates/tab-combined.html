@@ -1,0 +1,96 @@
+{% extends("layout.html") %}
+{% block content %}
+<h3 class="mt-5">Protocol Stat Comparison</h3>
+<div id="combined_volume_by_date_usd">
+    <div class="loader"></div>
+  </div>
+  <div id="combined_volume_by_date_user">
+    <div class="loader"></div>
+  </div>
+  <div class="row">
+      <div class="col-sm-12 col-md-6">
+          <div id="combined_volume_monthly_median_usd">
+              <div class="loader"></div>
+          </div>
+      </div>
+      <div class="col-sm-12 col-md-6">
+          <div id="combined_volume_monthly_median_user">
+              <div class="loader"></div>
+          </div>
+      </div>
+  </div>
+  <div id="combined_volume_by_token">
+    <div class="loader"></div>
+  </div>
+  <div id="combined_volume_total_volume_by_source">
+    <div class="loader"></div>
+  </div>
+  <div id="combined_volume_total_volume_by_source_and_protocol">
+    <div class="loader"></div>
+  </div>
+  <h3 class="mt-5">Bucketed Stats</h3>
+  <div id="combined_bucketed_user_stats_total_amount_usd">
+    <div class="loader"></div>
+  </div>
+  <div id="combined_bucketed_user_stats_avg_amount_usd_chain_tx">
+    <div class="loader"></div>
+  </div>
+  <div class="row">
+      <div class="col-sm-12 col-md-6">
+          <div id="combined_bucketed_user_stats_median_days_active">
+              <div class="loader"></div>
+          </div>
+      </div>
+      <div class="col-sm-12 col-md-6">
+          <div id="combined_bucketed_user_stats_median_tx_count">
+              <div class="loader"></div>
+          </div>
+      </div>
+  </div>
+<div style="padding-bottom: 100px;"></div>
+
+<div class="graph-container">
+
+</div>
+{% endblock %}
+
+
+
+{% block script %}
+<script>
+    $(document).ready(async function(){
+        $('#details-dropdown').addClass('active');
+        $('#combined').addClass('active');
+
+        let urls = [
+            '/api/combined_volume', 
+            '/api/combined_bucketed_user_stats',
+        ];
+
+        let graphs = await Promise.all(urls.map(url => getGraphFromUrl(url)));
+        let index = 0;
+
+        for(const graph of graphs) {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+
+                // no need to process if doesn't exist
+                if($(`#${url}_${key}`).length == 0) continue;
+
+                $(`#${url}_${key}`).html(`<div>${graphHtml}</div>`);
+
+                // for performance
+                await sleep(20);
+            }
+            index++;
+        }
+
+        /* graphs.forEach((graph, index) => {
+            for(const [key, graphHtml] of Object.entries(graph)) {
+                let url = urls[index].replace('/api/', '');
+                $(`.graph-container`).append(`<span>${url}_${key}</span><div>${graphHtml}</div>`);
+            }
+        }); */
+    });
+</script>
+{% endblock %}

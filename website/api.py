@@ -1515,3 +1515,273 @@ def predict():
         ret[key] = result[0]
 
     return ret
+
+#combine
+@api.route('/combined_volume')
+async def combined_volume():
+    color_discrete_map = {'stargate': 'rgb(255,0,0)', 'satellite': 'rgb(0,255,0)', 'squid': 'rgb(0,0,255)'}
+
+    queryIds = [
+        '3e4cb76d-f7a8-4b42-b542-4d6a423ebff1',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df = pd.DataFrame(data)
+    df['PROTOCOL'] = 'satellite'
+    
+    queryIds = [
+        '8b11eb1e-94cc-46a2-8960-e070c5b94347',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df2 = pd.DataFrame(data)
+    df2['PROTOCOL'] = 'squid'
+
+    queryIds = [
+        '5ca98cb1-ed7a-43eb-9b37-8f61dd8ee3fd',
+    ]
+    data = await get_unioned_data_from(queryIds)
+
+    df3 = pd.DataFrame(data)
+    df3['PROTOCOL'] = 'stargate'
+    
+    df = pd.concat([df, df2, df3])
+
+    protocol_df = df.groupby("PROTOCOL").sum(numeric_only=True).sort_values("TOKEN_AMOUNT_USD", ascending=False)
+
+    # get data by total volume for source chain
+    fig = px.bar(
+                protocol_df, 
+                y='TOKEN_AMOUNT_USD',
+                title="USD Value Bridged by Protocol",
+                labels={
+                    "PROTOCOL": "Protocol",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Protocol", hovermode="x")
+
+    # get data by month's median
+    df2 = pd.concat([df, df2, df3])
+
+    # sum all data first
+    df2 = df2.groupby(['PROTOCOL','DATE']).sum(numeric_only=True).reset_index()
+    df2['YearMonth'] = pd.to_datetime(df2['DATE'],format='%Y-%m-%d').apply(lambda x: x.strftime('%Y-%m'))
+    monthly_median = df2.groupby(['YearMonth', 'PROTOCOL']).median(numeric_only=True).reset_index().set_index('YearMonth')
+
+    fig2 = px.line(
+                monthly_median, 
+                y='TOKEN_AMOUNT_USD',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Median USD Value Bridged Per Month",
+                labels={
+                    "YearMonth": "Month",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig2.update_layout(yaxis_title="Amount USD", xaxis_title="Month", hovermode="x")
+
+    fig2_user = px.line(
+                monthly_median, 
+                y='USER_COUNT',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Median Bridgers Per Day By Month",
+                labels={
+                    "YearMonth": "Month",
+                    "USER_COUNT": "User Count"
+                }
+            )
+    fig2_user.update_layout(yaxis_title="User Count", xaxis_title="Month", hovermode="x")
+
+    #get data by date and source chain
+    by_date_df = df.groupby(['DATE', 'PROTOCOL']).sum(numeric_only=True).reset_index().set_index('DATE')
+    fig3 = px.bar(
+        by_date_df,
+        y="TOKEN_AMOUNT_USD",
+        color="PROTOCOL",
+        color_discrete_map=color_discrete_map,
+        title="USD Value Bridged Per Day by Protocol",
+        labels={
+            "PROTOCOL": "Protocol",
+            "TOKEN_AMOUNT_USD": "Amount USD"
+        }
+    )
+    fig3.update_layout(yaxis_title="Amount USD", xaxis_title="Date", hovermode="x")
+
+    fig3_user = px.bar(
+        by_date_df,
+        y="USER_COUNT",
+        color="PROTOCOL",
+        color_discrete_map=color_discrete_map,
+        title="Bridgers Per Day By Chain",
+        labels={
+            "PROTOCOL": "Protocol",
+            "USER_COUNT": "User Count"
+        }
+    )
+    fig3_user.update_layout(yaxis_title="User Count", xaxis_title="Date", hovermode="x")
+
+    #token amounts
+    df['LOWERCASE_SYMBOL'] = df["SYMBOL"].apply(lambda x: x.lower())
+    token_total_df = df.groupby(["PROTOCOL", "LOWERCASE_SYMBOL"]).sum(numeric_only=True).sort_values("TOKEN_AMOUNT_USD", ascending=False).reset_index()
+    filter = token_total_df["TOKEN_AMOUNT_USD"] > 1e6
+    token_total_df = token_total_df.where(filter).dropna().set_index("LOWERCASE_SYMBOL").sort_values("TOKEN_AMOUNT_USD", ascending=False)
+
+    fig4 = px.bar(
+                token_total_df, 
+                y='TOKEN_AMOUNT_USD',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="USD Value Bridged by Token",
+                labels={
+                    "LOWERCASE_SYMBOL": "Symbol",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig4.update_layout(yaxis_title="Amount USD", xaxis_title="Symbol", hovermode="x")
+    fig4.update_xaxes(categoryorder="total descending")
+
+    protocol_chain_df = df.groupby(["PROTOCOL", "SOURCE_CHAIN"]).sum(numeric_only=True).reset_index().set_index("SOURCE_CHAIN").sort_values("TOKEN_AMOUNT_USD", ascending=False)
+
+    # get data by total volume for source chain
+    fig5 = px.bar(
+                protocol_chain_df, 
+                y='TOKEN_AMOUNT_USD',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="USD Value Bridged per Chain by Protocol",
+                labels={
+                    "SOURCE_CHAIN": "Source Chain",
+                    "TOKEN_AMOUNT_USD": "Amount USD"
+                }
+            )
+    fig5.update_layout(yaxis_title="Amount USD", xaxis_title="Chain", hovermode="x")
+    fig5.update_xaxes(categoryorder="total descending")
+
+    return {
+        "total_volume_by_source": fig.to_html(),
+        "monthly_median_usd": fig2.to_html(),
+        "by_date_usd": fig3.to_html(),
+
+        "monthly_median_user": fig2_user.to_html(),
+        "by_date_user": fig3_user.to_html(),
+
+        "by_token": fig4.to_html(),
+
+        "total_volume_by_source_and_protocol": fig5.to_html(),
+    }
+
+@api.route('/combined_bucketed_user_stats')
+async def combined_bucketed_user_stats():
+    color_discrete_map = {'stargate': 'rgb(255,0,0)', 'satellite': 'rgb(0,255,0)', 'squid': 'rgb(0,0,255)'}
+
+    queryIds = [
+        'dd8fc222-b50d-4722-8034-c7bf175363fc', #
+    ]
+    data = await get_unioned_data_from(queryIds)
+    df = pd.DataFrame(data)
+    df["PROTOCOL"] = 'satellite'
+
+    queryIds = [
+        '57554cb0-9435-45dd-97ec-ae6175eac1d9', #
+    ]
+    data = await get_unioned_data_from(queryIds)
+    df2 = pd.DataFrame(data)
+    df2["PROTOCOL"] = 'squid'
+
+    queryIds = [
+        '0c0803f3-7bfc-4a4e-802a-73569687ea3d', #
+    ]
+    data = await get_unioned_data_from(queryIds)
+    df3 = pd.DataFrame(data)
+    df3["PROTOCOL"] = 'stargate'
+
+    df = pd.concat([df, df2, df3])
+    df.set_index("BUCKET", inplace=True)
+
+    #get averages
+    df["AVERAGE_AMOUNT_USD_PER_TX"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["TX_COUNT"]
+    df["AVERAGE_AMOUNT_USD_PER_USER"] = df["GRAND_TOTAL_AMOUNT_USD_BRIDGED"] / df["ADDRESS_COUNT"]
+
+    # get data by total volume for source chain
+    fig = px.bar(
+                df, 
+                y='GRAND_TOTAL_AMOUNT_USD_BRIDGED',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="USD Bridged by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "GRAND_TOTAL_AMOUNT_USD_BRIDGED": "Amount USD"
+                },
+                barmode='group'
+            )
+    fig.update_layout(yaxis_title="Amount USD", xaxis_title="Bucket", hovermode="x")
+
+
+    # get data by total volume for source chain
+    fig2_avg_tx = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_TX',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Average USD Bridged Per Tx by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_TX": "Amount USD"
+                },
+                barmode='group'
+            )
+    fig2_avg_tx.update_layout(yaxis_title="Amount USD", xaxis_title="Bucket", hovermode="x")
+
+    fig2_avg_user = px.bar(
+                df, 
+                y='AVERAGE_AMOUNT_USD_PER_USER',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Average USD Bridged Per User by Bucket",
+                labels={
+                    "BUCKET": "Bucket",
+                    "AVERAGE_AMOUNT_USD_PER_User": "Amount USD"
+                },
+                barmode='group'
+            )
+    fig2_avg_user.update_layout(yaxis_title="Amount USD", xaxis_title="Bucket", hovermode="x")
+
+    fig2_median_tx_count = px.bar(
+                df, 
+                y='MEDIAN_TX_COUNT',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Median Tx Count",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_TX_COUNT": "Tx Count"
+                },
+                barmode='group'
+            )
+    fig2_median_tx_count.update_layout(yaxis_title="Tx Count", xaxis_title="Bucket", hovermode="x")
+
+    fig2_median_days_active = px.bar(
+                df, 
+                y='MEDIAN_DAYS_ACTIVE',
+                color="PROTOCOL",
+                color_discrete_map=color_discrete_map,
+                title="Median Days Active",
+                labels={
+                    "BUCKET": "Bucket",
+                    "MEDIAN_DAYS_ACTIVE": "Days Active"
+                },
+                barmode='group'
+            )
+    fig2_median_days_active.update_layout(yaxis_title="Days Active", xaxis_title="Bucket", hovermode="x")
+
+    return {
+        "total_amount_usd": fig.to_html(),
+        "median_tx_count": fig2_median_tx_count.to_html(),
+        "median_days_active": fig2_median_days_active.to_html(),
+        "avg_amount_usd_chain_tx": fig2_avg_tx.to_html(),
+        "avg_amount_usd_chain_user": fig2_avg_user.to_html(),
+    }

@@ -37,6 +37,10 @@ async def overview():
 async def sql():
     return render_template("tab-sql.html", page="sql")
 
+@views.route('/compare')
+async def combined():
+    return render_template("tab-combined.html", page="combined")
+
 @views.route('/v2')
 async def v2():
     return render_template("v2.html", page="v2")
